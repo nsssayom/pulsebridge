@@ -45,7 +45,7 @@ The key architecture challenge is to make this coherent path \emph{both correct 
 
 \section{Related Work and Gap}
 \subsection{Safety Islands in Automotive SoCs}
-Modern automotive platforms already include safety islands. Arm Automotive Solutions (e.g., Zena CSS/Kronos) documents a safety island alongside application-class compute and an explicit cross-domain messaging path (HIPC)~\cite{ArmAutoSolutionsOverview,ArmZenaCSS,ArmHIPC}. NVIDIA's DriveOS documentation similarly describes a functional safety island with defined responsibilities and a controlled interface to the rest of the SoC~\cite{NVIDIADriveFSI}. A Siemens white paper makes the same case: keep safety-related control and safety/security/test data handling in a segregated subsystem aligned with ISO~26262 processes~\cite{SiemensSI}.
+Modern automotive platforms already include safety islands. Arm Automotive Solutions platforms---including the Zena CSS subsystem~\cite{ArmZenaCSS} and the Kronos reference design~\cite{ArmAutoSolutionsOverview}---incorporate a safety island alongside application-class compute; Kronos further documents an explicit cross-domain messaging path (HIPC)~\cite{ArmHIPC}. NVIDIA's DriveOS documentation similarly describes a functional safety island with defined responsibilities and a controlled interface to the rest of the SoC~\cite{NVIDIADriveFSI}. A Siemens white paper makes the same case: keep safety-related control and safety/security/test data handling in a segregated subsystem aligned with ISO~26262 processes~\cite{SiemensSI}.
 
 These sources establish \emph{isolation and communication mechanisms}, but they do not define the monitoring-oriented interface contract we need. In particular, they do not specify how to export controller intent as a coherent, consistently readable record (what constitutes a single ``step'' and how snapshots are formed) or how that record should align (in time) with independent actuation evidence. Our proposal asks whether a small, access-controlled cache-coherent shared-memory region can serve as the low-latency monitoring interface, and what correctness and predictability constraints that implies.
 
@@ -63,7 +63,7 @@ Taken together, these works provide strong semantics and monitoring algorithms, 
 \subsection{Cache-Coherent Sharing, Ordering, and Predictability}
 Cache coherence provides a natural substrate for low-latency intent export: the \PrimaryCompute can write controller records into a shared region and the \SafetyIsland can read them without software-managed copying or cache maintenance, using standard coherent interfaces (e.g., Arm AMBA ACE/CHI-style protocols)~\cite{ArmAMBA4,ArmAMBA5}. However, coherence alone does not imply atomic multi-field snapshots. Weak ordering can still expose mixed old/new fields unless the interface contract includes explicit synchronization, which is especially relevant on Arm systems~\cite{Pulte2018SimplifyingARM}.
 
-Coherent sharing also raises two additional challenges that are central to this project. First, the \PrimaryCompute and \SafetyIsland may not have identical memory-model behavior; recent work (MemGlue) shows that coherence protocols must be aware of memory-consistency requirements in heterogeneous systems to avoid mismatches~\cite{CleavelandTrippel2024MemGlue}. Compound consistency models similarly motivate reasoning about the CPU--island interface as a composed contract, not a single monolithic ``system memory model''~\cite{Goens2023CompoundConsistency}.
+Coherent sharing also raises two additional challenges that are central to this project. First, the \PrimaryCompute and \SafetyIsland may not have identical memory-model behavior; recent work (MemGlue) shows that coherence protocols must be aware of memory-consistency requirements in heterogeneous systems to avoid mismatches~\cite{CleavelandTrippel2024MemGlue}. Compound memory models similarly motivate reasoning about the CPU--island interface as a composed contract, not a single monolithic ``system memory model''~\cite{Goens2023CompoundConsistency}.
 
 Second, coherence can harm predictability: shared caches and coherence traffic introduce contention that can inflate worst-case latency. There is substantial real-time systems work on making coherence predictable (e.g., predictable coherence protocols and predictable integration of commodity coherent fabrics)~\cite{Hassan2017PredictableCoherence,Kaushik2021PredictableCoherence,Hassan2022IntegratingCOTSCoherence}. Mixed-criticality work also highlights the tension between strong isolation and efficient sharing on coherent multicore platforms~\cite{Chisholm2016TensionIsolationSharing}.
 
@@ -87,27 +87,60 @@ Figure~\ref{fig:arch} sketches the proposed architecture. The controller runs on
   \begin{tikzpicture}[
       box/.style={draw,rounded corners,align=center,inner sep=3pt},
       arr/.style={-Latex,thick},
-      node distance=3mm and 5mm,
+      lbl/.style={font=\scriptsize},
     ]
-    \node[box] (ctrl) {\PrimaryCompute\\controller\\(A-profile)};
-    \node[box, right=of ctrl, xshift=6mm] (pwm) {PWM\\peripheral};
-    \node[box, right=of pwm, xshift=7mm] (plant) {Actuation path\\\& plant\\(realized)};
+    %% === Row 1: Actuation chain ===
+    \node[box] (ctrl) at (0,0)
+      {\PrimaryCompute\\controller\\(A-profile)};
+    \node[box] (pwm)  at (2.8,0)
+      {PWM\\peripheral};
+    \node[box] (plant) at (5.3,0)
+      {Actuation path\\\& plant\\(realized)};
 
-    \node[box, below=of pwm, yshift=-3mm] (mailbox) {Coherent\\shared memory};
-    \node[box, below=of plant, yshift=-3mm] (evidence) {Evidence tap\\(realized actuation)};
+    \draw[arr] (ctrl) -- node[above,lbl]{$d_k$} (pwm);
+    \draw[arr] (pwm)  -- node[above,lbl]{waveform} (plant);
 
-    \node[box, below=of mailbox, xshift=-15mm, yshift=-4mm] (si) {\SafetyIsland\\(R/M-class)\\Policy monitor};
-    \node[box, below=of plant, xshift=5mm, yshift=-25mm] (react) {Safety\\reaction\\(fail-safe)};
+    %% === Row 2: Coherent interconnect (left, does not span evidence) ===
+    \node[draw,thick,fill=black!5,rounded corners=1pt,
+          minimum width=32mm,minimum height=5mm,
+          font=\scriptsize,align=center]
+      (bus) at (1.0,-1.5)
+      {Coherent interconnect\\(ACE/CHI)};
 
-    \draw[arr] (ctrl) -- node[above]{intended} (pwm);
-    \draw[arr] (pwm) -- node[above]{waveform} (plant);
-    \draw[arr] (ctrl) -- (mailbox);
-    \draw[arr] (evidence) -- (si);
-    \draw[arr] (mailbox) -- (si);
-    \draw[arr] (si) -- (react);
-    \draw[arr,dashed] (react) |- (ctrl);
+    %% === Evidence tap (right side, clearly separated from bus) ===
+    \node[box] (evidence) at (5.3,-2.3)
+      {Evidence tap\\(realized $E_k$)};
+
+    %% === Shared memory (below bus) ===
+    \node[box] (mailbox) at (1.0,-2.9)
+      {Coherent shared\\memory ($d_k$,\,ts)};
+
+    %% === Row 4: Safety island + reaction ===
+    \node[box] (si) at (1.5,-4.4)
+      {\SafetyIsland\\(R/M-class)\\Policy monitor};
+    \node[box] (react) at (5.3,-4.4)
+      {Safety\\reaction\\(fail-safe)};
+
+    %% --- Intent-export path (left, through coherent fabric) ---
+    \draw[arr] (ctrl.south) --
+      node[left,lbl,pos=0.4]{\scriptsize export}
+      (ctrl.south |- bus.north);
+    \draw[arr] (bus) -- (mailbox);
+    \draw[arr] (mailbox) --
+      node[left,lbl]{intent} (si);
+
+    %% --- Evidence path (right, independent observation) ---
+    \draw[arr] (plant) --
+      node[right,lbl,pos=0.3]{observe} (evidence);
+    \draw[arr] (evidence) --
+      node[above,lbl,pos=0.4]{evidence} (si);
+
+    %% --- Reaction path ---
+    \draw[arr] (si) --
+      node[above,lbl]{violation} (react);
+    \draw[arr,dashed] (react.south) -- ++(0,-0.3) -| (ctrl.west);
   \end{tikzpicture}
-  \caption{Policy-level monitoring on a \SafetyIsland. The monitor consumes controller exports via cache-coherent shared memory and independent evidence to evaluate temporal safety policies online.}
+  \caption{Policy-level monitoring on a \SafetyIsland. The monitor reads controller intent exported via cache-coherent shared memory (left path) and independently acquires evidence of realized actuation (right path) to evaluate temporal safety policies online. On violation, the island triggers a safety reaction within the \FTTI.}
   \label{fig:arch}
 \end{figure}
 
@@ -127,16 +160,16 @@ We use \STL as a representative policy language for timing requirements over sam
 
 We adopt robust semantics where a monitor computes a robustness value $\rho(\varphi, t)$ such that $\rho<0$ implies violation and $|\rho|$ quantifies margin~\cite{FainekosPappas2009,Deshmukh2017}. Robustness is also a natural fit for CPS monitoring under bounded sensor noise and bounded time-alignment error between controller reports and evidence.
 
-\section{Soundness Argument (Sketch)}
-The proposal's soundness claim is conditional: it establishes that, under stated interface and timing assumptions, the \SafetyIsland's monitor decision corresponds to the semantics of the specified policy.
+% \section{Soundness Argument (Sketch)}
+% The proposal's soundness claim is conditional: it establishes that, under stated interface and timing assumptions, the \SafetyIsland's monitor decision corresponds to the semantics of the specified policy.
 
-\textbf{(1) Monitor correctness for robust \STL.} Given aligned traces for intended and realized signals, the monitor computes a robustness value $\rho(\varphi,t)$. When $\rho(\varphi,t)<0$, the property $\varphi$ is violated at time $t$ under robust semantics~\cite{Deshmukh2017}.
+% \textbf{(1) Monitor correctness for robust \STL.} Given aligned traces for intended and realized signals, the monitor computes a robustness value $\rho(\varphi,t)$. When $\rho(\varphi,t)<0$, the property $\varphi$ is violated at time $t$ under robust semantics~\cite{Deshmukh2017}.
 
-\textbf{(2) Consistent controller snapshots.} If the controller record is exported via coherent shared memory using a synchronization discipline that prevents mixed old/new fields, then the \SafetyIsland evaluates policies over the intended command for that step. A key deliverable is to specify the minimal ordering rules (under the relevant memory models) that make this snapshot property true for an A-profile CPU paired with microcontroller-class cores~\cite{Pulte2018SimplifyingARM,CleavelandTrippel2024MemGlue,Goens2023CompoundConsistency}.
+% \textbf{(2) Consistent controller snapshots.} If the controller record is exported via coherent shared memory using a synchronization discipline that prevents mixed old/new fields, then the \SafetyIsland evaluates policies over the intended command for that step. A key deliverable is to specify the minimal ordering rules (under the relevant memory models) that make this snapshot property true for an A-profile CPU paired with microcontroller-class cores~\cite{Pulte2018SimplifyingARM,CleavelandTrippel2024MemGlue,Goens2023CompoundConsistency}.
 
-\textbf{(3) Temporal alignment soundness.} If the evidence acquisition path guarantees that evidence $E_k$ corresponds to the same physical actuation interval as the controller record $d_k$ (within bounded skew), then the monitor evaluates predicates over the correct windows. Where skew is non-zero but bounded, we incorporate it into policy timing bounds and robustness thresholds.
+% \textbf{(3) Temporal alignment soundness.} If the evidence acquisition path guarantees that evidence $E_k$ corresponds to the same physical actuation interval as the controller record $d_k$ (within bounded skew), then the monitor evaluates predicates over the correct windows. Where skew is non-zero but bounded, we incorporate it into policy timing bounds and robustness thresholds.
 
-\textbf{(4) End-to-end reaction within \FTTI.} If the worst-case time to obtain a consistent controller record via coherent sharing, plus the monitor's worst-case execution time, plus actuation of the reaction is bounded by $\Delta \leq \FTTI$, then a detected violation can be controlled before it becomes a hazard (as required by functional safety practice)~\cite{ISO26262,NVIDIADriveFSI,Hassan2022IntegratingCOTSCoherence}.
+% \textbf{(4) End-to-end reaction within \FTTI.} If the worst-case time to obtain a consistent controller record via coherent sharing, plus the monitor's worst-case execution time, plus actuation of the reaction is bounded by $\Delta \leq \FTTI$, then a detected violation can be controlled before it becomes a hazard (as required by functional safety practice)~\cite{ISO26262,NVIDIADriveFSI,Hassan2022IntegratingCOTSCoherence}.
 
 \section{Case Study: PWM Actuation Integrity Policies}
 PWM is a useful case study because it is ubiquitous in automotive actuation (traction inverter control, electric power steering, DC--DC conversion), and because PWM parameters provide a compact controller report while the realized waveform provides rich, independently measurable evidence.

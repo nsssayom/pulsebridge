@@ -7,13 +7,15 @@
 \citation{MalerNickovic2004,FainekosPappas2009,Deshmukh2017}
 \citation{Pulte2018SimplifyingARM}
 \citation{Hassan2017PredictableCoherence,Hassan2022IntegratingCOTSCoherence}
-\citation{ArmAutoSolutionsOverview,ArmZenaCSS,ArmHIPC}
+\citation{ArmZenaCSS}
+\citation{ArmAutoSolutionsOverview}
+\citation{ArmHIPC}
 \citation{NVIDIADriveFSI}
 \citation{SiemensSI}
-\citation{ArmActuationDemo}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Motivation and Scope}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {2}Related Work and Gap}{1}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Safety Islands in Automotive SoCs}{1}{subsection.2.1}\protected@file@percent }
+\citation{ArmActuationDemo}
 \citation{Sha1998SimplexACC,Sha2001UsingSimplicity}
 \citation{Rutledge2018RSimplex,Yalcinkaya2023Ulgen,Desai2022BlackBoxSimplex}
 \citation{MalerNickovic2004}
@@ -41,16 +43,13 @@
 \citation{Pulte2018SimplifyingARM,CleavelandTrippel2024MemGlue,Goens2023CompoundConsistency}
 \citation{Hassan2017PredictableCoherence,Hassan2022IntegratingCOTSCoherence,Chisholm2016TensionIsolationSharing}
 \citation{FainekosPappas2009,Deshmukh2017}
-\citation{Deshmukh2017}
-\citation{Pulte2018SimplifyingARM,CleavelandTrippel2024MemGlue,Goens2023CompoundConsistency}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Policy-level monitoring on a safety island\xspace  . The monitor consumes controller exports via cache-coherent shared memory and independent evidence to evaluate temporal safety policies online.}}{3}{figure.1}\protected@file@percent }
-\newlabel{fig:arch}{{1}{3}{Policy-level monitoring on a \SafetyIsland . The monitor consumes controller exports via cache-coherent shared memory and independent evidence to evaluate temporal safety policies online}{figure.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Policy-level monitoring on a safety island\xspace  . The monitor reads controller intent exported via cache-coherent shared memory (left path) and independently acquires evidence of realized actuation (right path) to evaluate temporal safety policies online. On violation, the island triggers a safety reaction within the FTTI\xspace  .}}{3}{figure.1}\protected@file@percent }
+\newlabel{fig:arch}{{1}{3}{Policy-level monitoring on a \SafetyIsland . The monitor reads controller intent exported via cache-coherent shared memory (left path) and independently acquires evidence of realized actuation (right path) to evaluate temporal safety policies online. On violation, the island triggers a safety reaction within the \FTTI }{figure.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Proposed Architecture and Research Questions}{3}{section.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}High-Level Architecture}{3}{subsection.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Research Questions and Hypotheses}{3}{subsection.4.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Policy Language and Monitor Model}{3}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Soundness Argument (Sketch)}{3}{section.5}\protected@file@percent }
-\citation{ISO26262,NVIDIADriveFSI,Hassan2022IntegratingCOTSCoherence}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Case Study: PWM Actuation Integrity Policies}{3}{section.5}\protected@file@percent }
 \citation{ArmAutoSolutionsOverview,NVIDIADriveFSI,ArmAMBA4,ArmAMBA5}
 \citation{Pulte2018SimplifyingARM,Hassan2017PredictableCoherence,Goens2023CompoundConsistency}
 \bibstyle{plain}
@@ -64,9 +63,6 @@
 \bibcite{Chisholm2016TensionIsolationSharing}{7}
 \bibcite{CleavelandTrippel2024MemGlue}{8}
 \bibcite{Desai2022BlackBoxSimplex}{9}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Case Study: PWM Actuation Integrity Policies}{4}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Expected Contributions}{4}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{4}{section.8}\protected@file@percent }
 \bibcite{Deshmukh2017}{10}
 \bibcite{Dokhanchi2015FPGASTL}{11}
 \bibcite{FainekosPappas2009}{12}
@@ -75,6 +71,8 @@
 \bibcite{Goens2023CompoundConsistency}{15}
 \bibcite{SiemensSI}{16}
 \bibcite{Hassan2017PredictableCoherence}{17}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Expected Contributions}{4}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{4}{section.7}\protected@file@percent }
 \bibcite{Hassan2022IntegratingCOTSCoherence}{18}
 \bibcite{ISO26262}{19}
 \bibcite{Kaushik2021PredictableCoherence}{20}

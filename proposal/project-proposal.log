@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  24 FEB 2026 09:33
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  24 FEB 2026 10:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -888,148 +888,144 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 
 
 [2]
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 100.
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
-17.
+50.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 
 
 
-[3]
-
-(./project-proposal.bbl
+[3] (./project-proposal.bbl
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `pcr' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 7.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 7.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 6.
 
-Underfull \hbox (badness 10000) in paragraph at lines 11--16
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10--14
 \T1/pcr/m/n/8 arm . com / architecture / system-[]architectures / amba / amba-[
 ]5$[][]\T1/ptm/m/n/8 (+20) .
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 18--24
+Underfull \hbox (badness 10000) in paragraph at lines 16--20
 []\T1/ptm/m/n/8 (+20) Arm.  Arm Au-to-mo-tive So-lu-tions (kro-nos) doc-u-men-t
 a-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 18--24
+Underfull \hbox (badness 10000) in paragraph at lines 16--20
 \T1/ptm/m/n/8 (+20) tion: Het-ero-ge-neous inter-processor com-mu-ni-ca-tion (H
 IPC).
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 18--24
+Underfull \hbox (badness 10000) in paragraph at lines 16--20
 [][]$\T1/pcr/m/n/8 https : / / arm-[]auto-[]solutions . docs . arm . com / en /
  v2 . 0 /
  []
 
 
-Underfull \hbox (badness 4954) in paragraph at lines 26--31
+Underfull \hbox (badness 4954) in paragraph at lines 22--26
 []\T1/ptm/m/n/8 (+20) Arm.  Arm Au-to-mo-tive So-lu-tions (kro-nos) doc-u-men-t
 a-tion:
  []
 
 
-Underfull \hbox (badness 1603) in paragraph at lines 33--38
-[]\T1/ptm/m/n/8 (+20) Arm.  Zena CSS: Au-to-mo-tive com-pute sub-sys-tem.  [][]
-$\T1/pcr/m/n/8 https :
+Underfull \hbox (badness 4403) in paragraph at lines 28--32
+\T1/pcr/m/n/8 com / products / automotive / compute-[]subsystems / zena$[][]\T1
+/ptm/m/n/8 (+20) .  Ac-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 33--38
-\T1/pcr/m/n/8 / / www . arm . com / products / silicon-[]ip-[]subsystems / css 
-/
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 40--46
+Underfull \hbox (badness 10000) in paragraph at lines 34--38
 []\T1/ptm/m/n/8 (+20) Arm.  Safety is-land ac-tu-a-tion demo (doc-u-men-ta-tion
 ).
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 40--46
+Underfull \hbox (badness 10000) in paragraph at lines 34--38
 [][]$\T1/pcr/m/n/8 https : / / safety-[]island-[]actuation-[]demo . docs . arm 
 . com /
  []
 
 
-
-[4]
-Underfull \hbox (badness 5316) in paragraph at lines 107--114
+Underfull \hbox (badness 5316) in paragraph at lines 85--89
 []\T1/ptm/m/n/8 (+20) Lee Har-ri-son.  Au-to-mo-tive safety is-land: Man-age-me
 nt of
  []
 
 
-Underfull \hbox (badness 7832) in paragraph at lines 107--114
+Underfull \hbox (badness 7832) in paragraph at lines 85--89
 \T1/ptm/m/n/8 (+20) test, safety, and se-cu-rity data at the edge for ISO 26262
 .
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 107--114
+Underfull \hbox (badness 10000) in paragraph at lines 85--89
 [][]$\T1/pcr/m/n/8 https : / / static . sw . cdn . siemens . com / siemens-[]di
 sw-[]assets /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 107--114
+Underfull \hbox (badness 10000) in paragraph at lines 85--89
 \T1/pcr/m/n/8 public / GxazRvSa7zjjPc1XYdwjl / en-[]US /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 107--114
+Underfull \hbox (badness 10000) in paragraph at lines 85--89
 \T1/pcr/m/n/8 Siemens-[]automotive-[]safety-[]island-[]WP-[]83774-[]V1-[]0624 .
  pdf$[][]\T1/ptm/m/n/8 (+20) ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 160--165
+
+[4]
+Underfull \hbox (badness 10000) in paragraph at lines 125--129
 \T1/ptm/m/n/8 (+20) vel-oper guide).  [][]$\T1/pcr/m/n/8 https : / / developer 
 . nvidia . com / docs /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 160--165
+Underfull \hbox (badness 10000) in paragraph at lines 125--129
 \T1/pcr/m/n/8 drive / drive-[]os / 7 . 0 . 3 / public / drive-[]os-[]linux-[]sd
 k /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 160--165
+Underfull \hbox (badness 10000) in paragraph at lines 125--129
 \T1/pcr/m/n/8 embedded-[]software-[]components / Functional _ Safety _ Island _
 
  []
 
-
-
 )
 
-[5] (./project-proposal.aux)
+
+
+[5
+
+] (./project-proposal.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `project-proposal.out' has not changed.
-(rerunfilecheck)             Checksum: 8BEE9C289FDCC441F69416FBABACD587;2911.
+(rerunfilecheck)             Checksum: 16208066F91DCA526B2D3BDF48007373;2720.
  ) 
 Here is how much of TeX's memory you used:
- 24135 strings out of 473190
- 444285 string characters out of 5715801
- 847301 words of memory out of 5000000
- 46552 multiletter control sequences out of 15000+600000
- 635616 words of font info for 360 fonts, out of 8000000 for 9000
+ 24149 strings out of 473190
+ 444442 string characters out of 5715801
+ 851846 words of memory out of 5000000
+ 46564 multiletter control sequences out of 15000+600000
+ 641731 words of font info for 364 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 90i,9n,93p,1013b,758s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,9n,93p,1013b,809s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
 ></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
@@ -1039,10 +1035,10 @@ sr/local/texlive/2025/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local
 25/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2025/texmf-d
 ist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/
 type1/urw/times/utmri8a.pfb>
-Output written on project-proposal.pdf (5 pages, 140949 bytes).
+Output written on project-proposal.pdf (5 pages, 139383 bytes).
 PDF statistics:
- 270 PDF objects out of 1000 (max. 8388607)
- 242 compressed objects within 3 object streams
- 51 named destinations out of 1000 (max. 500000)
- 84605 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 259 PDF objects out of 1000 (max. 8388607)
+ 231 compressed objects within 3 object streams
+ 50 named destinations out of 1000 (max. 500000)
+ 88693 words of extra memory for PDF output out of 89155 (max. 10000000)
 
