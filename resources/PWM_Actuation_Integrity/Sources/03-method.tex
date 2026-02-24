@@ -1,0 +1,37 @@
+\section{Methodology: Actuation Integrity Attestation}
+\label{sec:methodology}
+\subsection{Design Overview}
+\begin{itemize}
+    \item Inputs: intended witness (e.g., $d_k$) and measured evidence $E_k$.
+    \item Output: integrity decision and safe reaction policy (e.g., safe torque off / limp mode / conservative fallback).
+\end{itemize}
+
+\subsection{Evidence Selection and Feature Extraction}
+\begin{itemize}
+    \item Evidence sources: PWM boundary timing, gate-driver output/switch-node timing, and/or switching-coupled plant signatures.
+    \item Feature extraction with control-aware conditioning:
+    \begin{equation}
+        F_k = \mathrm{Feat}(E_k \mid d_k, x_k, u_k).
+    \end{equation}
+    \item Rationale: conditioning reduces variance due to operating point, load, and environment, enabling security-grade decisions.
+\end{itemize}
+
+\subsection{Decision Rule, Calibration, and Latency}
+\begin{itemize}
+    \item Define a decision statistic (e.g., similarity score, residual, or hypothesis test) comparing expected vs observed fingerprints.
+    \item Calibration procedure: enrollment/baseline collection across operating conditions; threshold selection for target FPR.
+    \item Detection latency: window size vs reaction time trade-off; requirement to detect within $\Delta$ control cycles.
+\end{itemize}
+
+\subsection{Attestation-Grade Elements and Security Discussion}
+\begin{itemize}
+    \item Freshness and replay resistance (nonce/epoch-based reporting); binding witness and evidence to the same time window.
+    \item Anti-spoofing: discuss attacker requirements to synthesize/relay fingerprints given the TCB and measurement point.
+    \item Clarify claims to avoid ``just anomaly detection'': define explicit integrity property, verifier role, and adversary model.
+\end{itemize}
+
+\subsection{Safe Reaction Policy}
+\begin{itemize}
+    \item Define actions on integrity failure; avoid destabilizing the control loop.
+    \item Discuss integration with vehicle safety supervision (e.g., torque reduction, fail-operational vs fail-silent modes).
+\end{itemize}

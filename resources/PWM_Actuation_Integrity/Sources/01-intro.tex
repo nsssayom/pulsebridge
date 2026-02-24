@@ -1,0 +1,7 @@
+\section{Introduction}
+\begin{itemize}
+    \item Motivation: modern vehicles rely on PWM-driven, safety-critical actuation (e.g., traction inverter, EPS, DC--DC).
+    \item Gap: security mechanisms often assume that if controller code is trusted, then actuation is trusted; however, the \emph{actuation path} can be manipulated post-compute.
+    \item High-level approach: define and verify \emph{actuation integrity} using control-aware evidence derived from the PWM$\rightarrow$gate-driver$\rightarrow$switching chain (or tightly coupled plant signatures).
+    \item Contributions (bulleted in final draft): (i) system/threat model for actuation-path integrity in vehicular actuators, (ii) representative attack classes and concrete instantiations, (iii) methodology for actuation integrity attestation (not firmware attestation), (iv) evaluation on a vehicle-representative HIL instantiation.
+\end{itemize}
