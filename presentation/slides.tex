@@ -5,21 +5,34 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{footline}[frame number]
 
+\usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{xspace}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc}
+\usetikzlibrary{arrows.meta,positioning,calc,decorations.pathreplacing}
 
+% --- Colors -----------------------------------------------------------------
 \definecolor{Dark}{HTML}{1D3557}
 \definecolor{Accent}{HTML}{E07A5F}
 \definecolor{Muted}{HTML}{6C757D}
+\definecolor{LightBg}{HTML}{F0F4F8}
 
 \setbeamercolor{structure}{fg=Dark}
 \setbeamercolor{frametitle}{fg=Dark}
 \setbeamercolor{title}{fg=Dark}
 \setbeamercolor{alerted text}{fg=Accent}
+\setbeamercolor{block title}{bg=Dark!12,fg=Dark}
+\setbeamercolor{block body}{bg=Dark!4,fg=black}
 
+% --- Custom itemize markers -------------------------------------------------
+\setbeamertemplate{itemize item}{\color{Accent}\small$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{Dark}\scriptsize$\blacksquare$}
+
+% --- Accent rule under frame titles -----------------------------------------
+\addtobeamertemplate{frametitle}{}{\vspace*{-0.6ex}{\color{Accent}\rule{0.25\textwidth}{1.2pt}}\vspace*{0.3ex}}
+
+% --- Convenience commands ---------------------------------------------------
 \newcommand{\hl}[1]{\textcolor{Accent}{#1}}
 \newcommand{\muted}[1]{\textcolor{Muted}{#1}}
 
@@ -29,17 +42,39 @@
 \newcommand{\STL}{STL\xspace}
 
 \title{Cache-Coherent Safety Islands for Low-Latency CPS Policy Monitoring}
-\subtitle{Project proposal: intent export + runtime policy checks within an \FTTI budget}
 \author{Nazmus Shakib Sayom}
 \institute{University of Utah}
 \date{February 2026}
 
 \begin{document}
 
-\begin{frame}
-  \titlepage
-\end{frame}
+% ============================================================================
+% TITLE PAGE
+% ============================================================================
+\begin{frame}[plain]
+  \vfill
+  \begin{center}
+    {\Large\bfseries\color{Dark}
+      Cache-Coherent Safety Islands for\\[6pt]
+      Low-Latency CPS Policy Monitoring}
 
+    \vspace{1em}
+    {\color{Accent}\rule{0.35\textwidth}{1.5pt}}
+
+    \vspace{1.2em}
+    {\normalsize Nazmus Shakib Sayom}\\[4pt]
+    {\small\color{Muted}University of Utah}
+
+    \vspace{0.8em}
+    {\small\color{Muted}February 2026}
+  \end{center}
+  \vfill
+\end{frame}
+\addtocounter{framenumber}{-1}
+
+% ============================================================================
+% MOTIVATION
+% ============================================================================
 \begin{frame}{Motivation: Functional Safety Implies Bounded Time}
 \begin{itemize}
 \item Functional safety requires detecting and controlling faults before hazards occur.
@@ -48,9 +83,12 @@
 \end{itemize}
 
 \vspace{0.8em}
-\textbf{Opportunity:} Move beyond watchdogs and fault flags to \hl{online policy monitoring} over real signals.
+Move beyond watchdogs and fault flags to \hl{online policy monitoring} over real signals.
 \end{frame}
 
+% ============================================================================
+% SAFETY ISLANDS
+% ============================================================================
 \begin{frame}{Safety Islands: Where They Sit and What They Do}
 \begin{itemize}
 \item \textbf{Isolation.} Separate core(s), memory region, and trusted software stack.
@@ -59,27 +97,32 @@
 \end{itemize}
 
 \vspace{0.8em}
-\textbf{Gap for this project:} architecture support to let the \SafetyIsland check \emph{behavioral safety policies} fast enough to matter.
+Missing today: architecture support to let the \SafetyIsland check \emph{behavioral safety policies} fast enough to matter.
 \end{frame}
 
+% ============================================================================
+% POLICY MONITORING
+% ============================================================================
 \begin{frame}{Policy Monitoring: Intent vs.\ Evidence}
 \textbf{Idea.} Check that the system's behavior stays within a safety envelope over time (deadlines, dwell times, tolerances).
 
 \vspace{0.6em}
 \begin{itemize}
-\item We need two views:
-  \begin{itemize}
-  \item \hl{Intent}: what the controller asked for.
-  \item \hl{Evidence}: what the system actually did.
-  \end{itemize}
+\item \hl{Intent:} what the controller asked for (e.g., duty, dead-time, update sequence, timestamp).
+\item \hl{Evidence:} what the system actually did (e.g., measured PWM edges / waveform timing).
+\item Policies are temporal constraints over signals; \STL is one common encoding.
 \item The \SafetyIsland correlates them and triggers a reaction if the policy is violated.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Example: PWM Actuation Integrity (Stress Test)}
+% ============================================================================
+% PWM EXAMPLE (simple diagram)
+% ============================================================================
+\begin{frame}{Example: PWM Actuation Integrity}
 \begin{center}
 \begin{tikzpicture}[
-    box/.style={draw,rounded corners,align=center,inner sep=4pt,font=\small},
+    box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small,
+                fill=LightBg},
     arr/.style={-Latex,thick},
     node distance=8mm and 18mm,
   ]
@@ -90,7 +133,8 @@
   \draw[arr] (ctrl) -- node[above, font=\scriptsize]{intent} (pwm);
   \draw[arr] (pwm) -- node[above, font=\scriptsize]{waveform} (plant);
 
-  \node[box, below=of pwm, yshift=-2mm, text width=3.2cm] (si) {\SafetyIsland\\policy monitor};
+  \node[box, below=of pwm, yshift=-2mm, text width=3.2cm,
+        fill=Accent!10] (si) {\SafetyIsland\\policy monitor};
   \draw[arr] (ctrl.south) |- node[pos=0.25, left, font=\scriptsize]{intent record} (si.west);
   \draw[arr] (plant.south) |- node[pos=0.25, right, font=\scriptsize]{evidence} (si.east);
 \end{tikzpicture}
@@ -102,8 +146,26 @@
 \end{itemize}
 \end{frame}
 
+% ============================================================================
+% STATE OF PRACTICE
+% ============================================================================
+\begin{frame}{State of Practice: DMA/IPC Safety-Island Interfaces}
+\begin{itemize}
+\item Most current \SafetyIsland designs ingest data via \hl{IPC mailboxes} and DMA-friendly shared buffers.
+\item Examples: Arm Kronos documents HIPC cross-domain messaging; NVIDIA DriveOS describes a functional safety island with controlled channels.
+\item For step-by-step intent export, these paths often require extra copies or cache maintenance.
+\item That overhead and jitter competes directly with tight \FTTI budgets.
+\end{itemize}
+
+\vspace{0.6em}
+We propose using a \hl{small cache-coherent shared region} as the safety-island interface for runtime policy monitoring.
+\end{frame}
+
+% ============================================================================
+% PROBLEM STATEMENT
+% ============================================================================
 \begin{frame}{Problem Statement}
-\textbf{We want:} check safety policies within \FTTI, using intent and evidence that live in different protection domains.
+Check safety policies within \FTTI, using intent and evidence that live in different protection domains.
 
 \vspace{0.6em}
 \textbf{Constraints.}
@@ -115,8 +177,13 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Goal and Hypothesis (Once the Context Is Set)}
-\textbf{Hypothesis.} \hl{Cache-coherent shared memory} is the best substrate for low-latency intent export from the \PrimaryCompute to an MCU-like \SafetyIsland monitor.
+% ============================================================================
+% GOAL AND HYPOTHESIS
+% ============================================================================
+\begin{frame}{Goal and Hypothesis}
+\begin{block}{Hypothesis}
+\hl{Cache-coherent shared memory} is the right substrate for low-latency intent export from the \PrimaryCompute to an MCU-like \SafetyIsland monitor.
+\end{block}
 
 \vspace{0.6em}
 \textbf{Project goal.} Define the \hl{architecture contract} that makes coherent monitoring both correct and time-bounded:
@@ -127,27 +194,51 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Why Cache-Coherent Shared Memory? (Pro-Coherence)}
+% ============================================================================
+% WHY CACHE-COHERENT
+% ============================================================================
+\begin{frame}{Why Cache-Coherent Shared Memory?}
 \textbf{Goal:} export controller intent to the \SafetyIsland with \hl{minimal latency and overhead}.
 
 \vspace{0.4em}
 \begin{itemize}
 \item \textbf{Single-copy path:} controller writes once; island reads via ordinary loads (no message copying).
-\item \textbf{Fast steady state:} avoids software-managed cache maintenance and explicit DMA staging.
+\item \textbf{Compared to IPC/DMA:} avoids extra copies and software-managed cache flush/invalidate on the fast path.
 \item \textbf{Good fit for control:} frequent small records, tight deadlines.
 \end{itemize}
 
 \vspace{0.7em}
-\textbf{One-sentence definition.} Cache coherence keeps caches consistent so both cores observe a single up-to-date value \emph{per memory location}.
+\textbf{Cache coherence:} both cores observe a single up-to-date value \emph{per memory location} without explicit cache maintenance.
 
 \vspace{0.4em}
-\textbf{Important nuance.} The project is to design the missing pieces for \emph{snapshot correctness} and \emph{bounded latency}.
+\textbf{What this proposal adds:} snapshot correctness and bounded latency for the coherent export path.
 \end{frame}
 
-\begin{frame}{Proposed Architecture (High Level)}
+% ============================================================================
+% RELATED WORK
+% ============================================================================
+\begin{frame}{Related Work and Gap}
+\begin{itemize}
+\item \textbf{Safety islands (practice):} Arm Kronos/HIPC and NVIDIA DriveOS describe isolated islands, typically using IPC/DMA-style channels.
+\item \textbf{Coherent fabrics (standards):} Arm AMBA ACE/CHI provide coherence-capable interconnects and coherent I/O options.
+\item \textbf{Correctness under weak ordering:} ARM memory-model work (e.g., Pulte et al.) and heterogeneous consistency work (e.g., MemGlue, Compound Consistency).
+\item \textbf{Bounded latency under contention:} predictable coherence (e.g., Hassan et al., Kaushik et al.) and mixed-criticality sharing vs.\ isolation (e.g., Chisholm et al.).
+\item \textbf{Monitoring foundations:} Simplex-style runtime assurance and temporal monitors (e.g., RTAMT), but they often assume the trace is already well-timed.
+\end{itemize}
+
+\vspace{0.6em}
+\textbf{Gap:} an end-to-end architecture for \hl{coherent intent export} + time-aligned evidence + bounded detection latency for safety-island policy monitoring.
+\end{frame}
+
+% ============================================================================
+% PROPOSED ARCHITECTURE
+% ============================================================================
+\begin{frame}{Proposed Architecture}
 \begin{center}
 \begin{tikzpicture}[
-    box/.style={draw,rounded corners,align=center,inner sep=4pt,font=\small},
+    box/.style={draw,rounded corners,align=center,inner sep=4pt,font=\small,
+                fill=LightBg},
+    sibox/.style={box, fill=Accent!10},
     arr/.style={-Latex,thick},
     node distance=8mm and 18mm,
   ]
@@ -158,7 +249,8 @@
   \node[box, below=of pwm, text width=3.2cm] (shm) {Cache-coherent\\shared memory\\(intent record)};
   \node[box, below=of plant, text width=2.9cm] (evidence) {Evidence tap\\(timestamped)};
 
-  \node[box, below=of shm, xshift=-18mm, text width=3.0cm] (si) {\SafetyIsland\\(MCU-like)\\policy monitor};
+  \node[sibox, below=of shm, xshift=-24mm, yshift=4mm, text width=3.0cm]
+    (si) {\SafetyIsland\\(MCU-like)\\policy monitor};
   \node[box, below=of evidence, text width=2.9cm] (react) {Safety reaction\\(fail-safe)};
 
   \draw[arr] (ctrl) -- node[above, font=\scriptsize]{intent} (pwm);
@@ -168,15 +260,20 @@
   \draw[arr] (shm) -- (si);
   \draw[arr] (evidence) -- (si);
   \draw[arr] (si) -- (react);
-  \draw[arr,dashed] (react.west) -| (ctrl.south);
+  % Feedback loop: route outside-left, arrive horizontally at ctrl.west
+  \draw[arr,dashed] (react.south) -- ++(0,-0.5)
+    -| ([xshift=-5mm]ctrl.west) -- (ctrl.west);
 \end{tikzpicture}
 \end{center}
 
 \vspace{-0.2em}
-\muted{Key idea:} coherence gives a low-latency export path; we design the interface contract that makes it reliable under weak ordering and contention.
+{\small Coherence provides a low-latency export path; this project defines the contract that makes it correct under weak ordering and time-bounded under contention.}
 \end{frame}
 
-\begin{frame}{Challenge: Reading a Consistent Record}
+% ============================================================================
+% CHALLENGE 1: CONSISTENT RECORDS
+% ============================================================================
+\begin{frame}{Challenge 1: Consistent Records}
 \textbf{Weak ordering:} other cores may observe your writes in a different order than your program order (unless you synchronize).
 
 \vspace{0.6em}
@@ -192,38 +289,58 @@
   \textbf{Reader (\SafetyIsland)}
   \begin{itemize}
   \item load ts == new
-  \item load duty == old \alert{(mixed step)}
+  \item load duty == old \alert{(mixed snapshot)}
   \end{itemize}
 \end{columns}
 
 \vspace{0.8em}
-\textbf{Design task:} define an \hl{export record + synchronization discipline} so island reads behave like consistent ``steps.''
+We need an \hl{export record + synchronization discipline} so island reads behave like consistent ``steps.''
 \end{frame}
 
-\begin{frame}{Challenge: Worst-Case Latency Under Contention}
+% ============================================================================
+% CHALLENGE 2: BOUNDED DETECTION LATENCY (redesigned)
+% ============================================================================
+\begin{frame}{Challenge 2: Bounded Detection Latency}
+\begin{center}
+\begin{tikzpicture}[
+    seg/.style={minimum height=8mm, inner sep=2pt,
+                font=\footnotesize\bfseries, text=white, align=center},
+  ]
+  % Budget segments
+  \node[seg, fill=Dark,   minimum width=30mm, anchor=west]
+    (exp) at (0,0) {$\Delta_{\text{export}}$};
+  \node[seg, fill=Accent, minimum width=30mm, anchor=west]
+    (mon) at (exp.east) {$\Delta_{\text{monitor}}$};
+  \node[seg, fill=Muted,  minimum width=24mm, anchor=west]
+    (rea) at (mon.east) {$\Delta_{\text{react}}$};
+
+  % Labels below
+  \node[below=1.5mm of exp, font=\scriptsize, text=Dark]   {coherent read};
+  \node[below=1.5mm of mon, font=\scriptsize, text=Accent] {policy evaluation};
+  \node[below=1.5mm of rea, font=\scriptsize, text=Muted]  {fail-safe trigger};
+
+  % Brace above
+  \draw[decorate, decoration={brace, amplitude=5pt, raise=2pt}]
+    (exp.north west) -- (rea.north east)
+    node[midway, above=8pt, font=\small]
+      {must be $\;\le\;$ \FTTI};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.2em}
 \begin{itemize}
-\item Coherence implies traffic (line transfers, invalidations/snoops, directory activity).
-\item Shared caches and interconnect arbitration add variability.
-\item Worst-case export+monitor latency must satisfy: \[
-  \Delta_{\text{export}} + \Delta_{\text{monitor}} + \Delta_{\text{react}} \le \FTTI.
-\]
+\item \textbf{Export:} coherence traffic (invalidations, line transfers, directory lookups) + interconnect arbitration.
+\item \textbf{Monitor:} policy evaluation over the current signal window (bounded by policy horizon).
+\item \textbf{React:} triggering the fail-safe output.
 \end{itemize}
 
-\vspace{0.8em}
-\textbf{Design task:} identify \hl{predictability mechanisms} (partitioning, priorities, protocol choices) that bound worst-case coherent-access latency.
+\vspace{0.3em}
+Contention inflates $\Delta_{\text{export}}$; we need \hl{predictability mechanisms} (partitioning, priorities, protocol choices) to bound the worst case.
 \end{frame}
 
-\begin{frame}{Prior Work: What We Build On (and What's Missing)}
-\begin{itemize}
-\item \textbf{Safety islands exist:} strong isolation and supervisory logic are well established.
-\item \textbf{Runtime verification exists:} temporal-policy monitoring is mature, including robustness ideas for noisy signals.
-\item \textbf{Real-time coherence exists:} there is prior work on making coherent memory systems more predictable.
-\end{itemize}
-
-\vspace{0.8em}
-\textbf{Gap (this project).} An application-driven \hl{contract} that connects these: a cache-coherent safety-island architecture for policy monitoring within \FTTI, with explicit snapshot correctness, time alignment, and worst-case latency bounds.
-\end{frame}
-
+% ============================================================================
+% RESEARCH QUESTIONS
+% ============================================================================
 \begin{frame}{Research Questions}
 \begin{itemize}
 \item \textbf{RQ1 (Coherent interface).} How should an MCU-like \SafetyIsland participate in coherence with an A-profile \PrimaryCompute?
@@ -233,21 +350,9 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Policy Monitoring Model (STL as a Representative Choice)}
-\begin{itemize}
-\item Policies are temporal constraints over signals (deadlines, dwell times, envelopes).
-\item \STL is one common language; the architecture should support other temporal formalisms too.
-\item Robust monitoring outputs a \textbf{margin} (how close to violation), useful under noise.
-\end{itemize}
-
-\vspace{0.6em}
-\textbf{Monitor I/O.}
-\begin{itemize}
-\item Inputs: controller record stream + evidence stream (time-aligned).
-\item Output: violation / negative robustness $\Rightarrow$ trigger safety reaction.
-\end{itemize}
-\end{frame}
-
+% ============================================================================
+% CASE STUDY
+% ============================================================================
 \begin{frame}{Case Study: PWM Actuation Integrity}
 \textbf{Signals.}
 \begin{itemize}
@@ -261,10 +366,14 @@
 \item Tracking: realized duty converges to intended duty within a deadline and stays within tolerance.
 \item Glitch exclusion: no pulses below a minimum width.
 \item Safety envelope: upon a safety condition, realized PWM enters a conservative envelope within a deadline.
+\item Policies can be encoded in \STL or similar temporal formalisms; robust monitoring can output a margin.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Soundness Story (Conditional)}
+% ============================================================================
+% SOUNDNESS
+% ============================================================================
+\begin{frame}{Soundness: What Must Hold}
 \textbf{Claim shape.} Under explicit interface + timing assumptions, the \SafetyIsland monitor's decision matches the intended policy semantics \emph{in time} to react within \FTTI.
 
 \vspace{0.6em}
@@ -272,18 +381,25 @@
 \begin{itemize}
 \item Coherent export path with a synchronization discipline that yields consistent snapshots.
 \item Bounded skew between controller timestamps and evidence timestamps.
-\item Worst-case export+monitor+reaction latency within \FTTI.
+\item Worst-case export + monitor + reaction latency within \FTTI.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Evaluation Plan (What We Will Measure/Show)}
+% ============================================================================
+% TOOLS
+% ============================================================================
+\begin{frame}{Tools and Interfaces We Will Explore}
 \begin{itemize}
-\item \textbf{Snapshot failure modes:} demonstrate how naive coherent sharing yields mixed records; show the minimal synchronization contract that fixes it.
-\item \textbf{Latency under contention:} microbench coherent export latency with controlled interference; estimate worst-case bounds.
-\item \textbf{End-to-end feasibility:} policy monitor over PWM traces (captured or synthesized) and evidence taps; measure detection latency vs.\ \FTTI.
+\item \textbf{Coherent interfaces:} Arm AMBA ACE/CHI to study coherent agent vs.\ coherent I/O attachment and access control for a shared region.
+\item \textbf{Ordering validation:} litmus tests + memory-model tools (e.g., Herd7) to validate the record format and synchronization discipline under weak ordering.
+\item \textbf{Latency analysis:} microbenchmarks and/or simulation (e.g., gem5) to characterize coherent access latency under contention and relate it to \FTTI budgets.
+\item \textbf{Monitor prototyping:} a temporal monitoring library (e.g., RTAMT) to prototype policy monitors on PWM traces.
 \end{itemize}
 \end{frame}
 
+% ============================================================================
+% CONTRIBUTIONS
+% ============================================================================
 \begin{frame}{Expected Contributions}
 \begin{itemize}
 \item A \hl{cache-coherent} safety-island monitoring architecture for low-latency CPS policy checks.
@@ -293,14 +409,23 @@
 \end{itemize}
 \end{frame}
 
+% ============================================================================
+% WRAP-UP
+% ============================================================================
 \begin{frame}{Wrap-Up}
-\textbf{Takeaway.} Coherence is not the problem; it is the \hl{enabler}. The project is to define the synchronization and predictability contract that makes coherent safety-island monitoring correct within \FTTI.
+\textbf{Takeaway.} We push \hl{cache-coherent shared memory} (not DMA/IPC) as the safety-island interface for low-latency intent export.
 
-\vspace{0.8em}
-\muted{Backup idea:} compare coherent sharing against non-coherent IPC/DMA export to quantify the ``coherence advantage'' under realistic budgets.
+\vspace{0.6em}
+\begin{itemize}
+\item Define a coherent interface + synchronization contract so the island reads consistent controller records.
+\item Bound worst-case coherent-access latency so policy checks stay meaningful within \FTTI.
+\item Ground the design in a PWM actuation-integrity case study (intent vs.\ evidence).
+\end{itemize}
 
-\vspace{0.8em}
-\textbf{Questions?}
+\vspace{1em}
+\begin{center}
+  {\Large\color{Dark}\textbf{Questions?}}
+\end{center}
 \end{frame}
 
 \end{document}
