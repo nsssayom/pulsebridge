@@ -1,0 +1,78 @@
+\subsection{Experimental Platform and Metrics}
+\label{sec:eval-method}
+
+\paragraph{Simulation platform.}
+All experiments run on gem5~25.1.0.0 in ARM SE mode with the
+\texttt{TimingSimpleCPU} front end and the Ruby
+\texttt{MESI\_Two\_Level} coherence protocol
+~\cite{Binkert2011gem5,LowePower2020gem5,SorinHillWood2020Primer}. A
+three-CPU system hosts one producer thread, one monitor thread, and one
+joiner thread. Cache contention is added with 0, 2, or 4 additional
+stressor CPUs running disjoint-line thrashers. For the two DMA-mirror
+architectures we attach a custom pull engine to the Ruby DMA sequencer.
+The setup is not a cycle-accurate model of a production AMBA CHI fabric.
+It is an architecture-level testbed with direct visibility into Ruby
+message counts and directory traffic.
+
+\paragraph{Interference model.}
+The 0/2/4-stressor sweep is a synthetic proxy for increasing co-runner
+pressure on shared caches and directory resources. The stressors touch
+disjoint lines, so they inject hierarchy interference without creating
+false sharing on the witness region itself. The goal is not to model one
+named application mix, but to test whether the publication ranking
+persists as background pressure rises.
+
+\paragraph{Workloads.}
+Each cell processes 5000 publications against two workload variants. The
+first, \emph{captured / periodic\_suppression}, is a sparse-divergence
+trace in which realized behavior matches intent except during short
+bursts. The second, \emph{synthesized / duty\_bias}, introduces a
+persistent +15\% multiplicative bias between intended and realized duty
+values, clipped to the valid duty range. With $\varepsilon=0.1$ and an
+\STL window of 8 samples, this sustained-bias workload produces
+repeated monitor events, ranging from 180 to 949 \STL violations per
+5000-publication run across the correct designs. The matrix therefore
+spans 5 architectures, 2 workloads, and 3 contention levels, for 30
+cells total.
+
+\paragraph{Benchmark structure.}
+The producer publishes one 64-byte record per trace step. For the two
+DMA-mirror architectures, a custom pull engine copies one 64-byte record
+from producer memory into the mirror every 1000 ns, which is the fixed
+transfer cadence for the study. The monitor reads as fast as the
+publication protocol allows and aligns successful snapshots to the
+evidence stream by epoch. This design intentionally stresses the
+publication path rather than emulating a wall-clock control loop.
+
+\paragraph{Metrics.}
+We report five primary metrics derived directly from Ruby statistics and
+bench-side counters.
+\begin{itemize}
+  \item \textbf{Torn-read fraction:} the fraction of attempted monitor
+    reads flagged as mixed records.
+  \item \textbf{CPU-side coherence messages per publish:} the sum of
+    L1-to-directory and directory-to-memory traffic, normalized by the
+    number of publishes.
+  \item \textbf{DMA messages per publish:} the
+    \texttt{dma\_cntrl0.requestToDir} count per publish, which is nonzero
+    only for the DMA-based architectures.
+  \item \textbf{Protocol retries per run:} the number of read attempts
+    rejected by the publication primitive and retried instead of being
+    returned as data.
+  \item \textbf{Whole-workload simulated time:} the simulated time
+    between \texttt{m5\_reset\_stats} and \texttt{bench\_dump\_stats}.
+\end{itemize}
+Because the producer runs unpaced, the whole-workload time is a
+throughput-style proxy for the cost of retiring the workload under each
+architecture. It is not a direct publication-to-alarm latency bound.
+
+\paragraph{Interpretation of the DMA comparison.}
+The DMA-based designs are not intended to represent a fully
+non-coherent monitor subsystem. The mirror still resides in the same
+coherent substrate. What changes is the communication pattern: the
+monitor no longer reads the producer's active record directly, but
+instead relies on an explicit pull into a second memory region. The
+comparison therefore answers a narrower and cleaner architecture
+question: when the substrate is coherent in both cases, is it cheaper
+and simpler to publish directly with a disciplined primitive, or to pay
+an explicit transfer path and validate a mirror?

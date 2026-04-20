@@ -1,0 +1,7 @@
+protocol,workload,stressors,dma_period_ns,cell_dir,host_wall_s,exit_cause
+dblbuf,captured/periodic_suppression,0,1000,/impl/results/gem5/matrix_full/dblbuf__captured-periodic_suppression__str0,58,ok
+dblbuf,captured/periodic_suppression,2,1000,/impl/results/gem5/matrix_full/dblbuf__captured-periodic_suppression__str2,137,ok
+dblbuf,captured/periodic_suppression,4,1000,/impl/results/gem5/matrix_full/dblbuf__captured-periodic_suppression__str4,199,ok
+dblbuf,synthesized/duty_bias,0,1000,/impl/results/gem5/matrix_full/dblbuf__synthesized-duty_bias__str0,60,ok
+dblbuf,synthesized/duty_bias,2,1000,/impl/results/gem5/matrix_full/dblbuf__synthesized-duty_bias__str2,140,ok
+dblbuf,synthesized/duty_bias,4,1000,/impl/results/gem5/matrix_full/dblbuf__synthesized-duty_bias__str4,200,ok

@@ -1,0 +1,27 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper studied how a controller should publish a multi-field record
+to a supervisory monitor over a coherent fabric. The main result is
+simple. Coherence is the substrate, not the publication contract. Both
+direct sharing and DMA mirroring fail when the record is published
+without an explicit primitive, and both become correct once one is
+imposed. Among the correct designs in this study, generation-based
+double buffering is the strongest point in the design space: it delivers
+zero torn reads, the lowest CPU-side coherence traffic, the shortest
+whole-workload simulated time, and negligible reader retries. The
+practical lesson is to specify the publication unit, the validity check,
+and the reader's behavior on overlap. A coherent fabric can move the
+latest line quickly, but it cannot tell the reader whether several
+fields belong to one logical publication.
+
+Although the case study uses PWM-inspired witness and evidence streams,
+the result applies more broadly to supervisory channels that export a
+fixed-size multi-field control or state summary. Our evidence is
+protocol-level rather than cycle-accurate, because the platform is gem5
+ARM SE mode with Ruby MESI\_Two\_Level, and the timing metric is
+whole-workload simulated time rather than a per-publication latency
+distribution. Within that scope, the conclusion is stable: monitor
+channels should be designed around a publication primitive, not around
+coherence alone, and primitive choice can dominate transport choice even
+when every design runs over the same coherent substrate.

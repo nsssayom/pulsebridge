@@ -1,0 +1,14 @@
+variant: synthesized/duty_bias
+kind: SYNTHESIZED
+generated_at: 2026-04-19T08:01:35Z
+generator: impl/workloads/tools/synthesize_duty_bias.py
+source: none (fully synthesized)
+witness_model: 0.5 + 0.3 * sin(2*pi*20.0 Hz * t + phase)
+  phase offsets: A=0, B=-2pi/3, C=+2pi/3
+evidence_model: clip(witness * 1.1500, 0, 1)  # CDC +15.0%% duty bias
+period_ns: 100000
+periods: 20000
+duration_s: 2.000000
+config_id: 2
+witness_sha256: 92137f74aeb1525571a61c58261b850a31145df897690e320b6d301b4b5b168f
+evidence_sha256: 183a620a31743a08e6b80c9e6116c626976df5990f3a582622f756066ee38cf9

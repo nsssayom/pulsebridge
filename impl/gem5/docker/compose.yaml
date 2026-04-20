@@ -1,0 +1,54 @@
+# Docker Compose setup for the Phase 3 gem5 environment.
+#
+# First-time setup:
+#   1. Clone gem5 somewhere accessible (outside or inside this repo):
+#        git clone https://github.com/gem5/gem5.git ~/src/gem5
+#   2. Copy .env.example to .env and point GEM5_SRC at that clone:
+#        cp .env.example .env
+#        $EDITOR .env          # set GEM5_SRC=/abs/path/to/gem5
+#   3. Build the image and gem5 itself:
+#        make image build-gem5 build-m5
+#   4. Cross-compile the SE-mode workload:
+#        make build-workload
+#   5. Smoke-run:
+#        make smoke
+#
+# Everything is orchestrated via the Makefile in this directory. Direct
+# invocations (`docker compose run --rm gem5 <cmd>`) also work if you
+# prefer.
+
+name: witness-gem5
+
+services:
+  gem5:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: witness-gem5:latest
+    # The compose project is at impl/gem5/docker/. The two bind mounts
+    # give the container (a) the user-provided gem5 source tree at /gem5
+    # and (b) the entire impl/ tree at /impl so the workload build and
+    # run_matrix.sh can see their relative siblings (workloads/, etc.).
+    volumes:
+      - ${GEM5_SRC:?set GEM5_SRC in .env to the path of your gem5 clone}:/gem5:cached
+      - ../../..:/repo:cached
+      - ../..:/impl:cached
+      # Keep gem5's build/ on a named volume to avoid hammering the
+      # macOS virtiofs layer with tens of thousands of .o files.
+      - gem5-build:/gem5/build
+      - gem5-util-build:/gem5/util/m5/build
+    environment:
+      GEM5_ROOT: /gem5
+      CC: aarch64-linux-gnu-gcc
+      AR: aarch64-linux-gnu-ar
+      M5_DIR: /gem5/util/m5/build/arm64
+    working_dir: /impl/gem5
+    # stdin_open + tty let `docker compose run` give us an interactive shell.
+    stdin_open: true
+    tty: true
+    # Override per invocation via `docker compose run --rm gem5 <cmd>`.
+    command: ["bash"]
+
+volumes:
+  gem5-build:
+  gem5-util-build:

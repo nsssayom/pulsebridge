@@ -1,0 +1,44 @@
+# OS / editor noise
+.DS_Store
+._*
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Local agent / editor config
+.claude/
+.vscode/
+.idea/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Generic local caches
+.cache/
+.mpl-cache/
+
+# Local environment files
+.env
+
+# External simulator checkout kept outside version control
+gem5-src/
+
+# Build outputs
+build/
+
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc

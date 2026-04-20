@@ -1,0 +1,85 @@
+[
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/publish_unsync.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/publish_unsync.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/publish_seqlock.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/publish_seqlock.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/publish_dblbuf.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/publish_dblbuf.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/residual.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/residual.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/stl_policy.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/src/stl_policy.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/main.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter", "-pthread",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/include",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/main.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/producer.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter", "-pthread",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/include",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/producer.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/monitor.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter", "-pthread",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/include",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/monitor.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/torn_detector.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter", "-pthread",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/include",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/torn_detector.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/workload.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter", "-pthread",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/include",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/src/workload.c"]
+  },
+  {
+    "directory": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/gem5/workload",
+    "file": "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/gem5/workload/stress.c",
+    "arguments": ["cc", "-xc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-Wno-unused-parameter",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/prototype/include",
+                  "-I/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/core/include",
+                  "-c", "/Users/nsssayom/Dev/adv.comp.arc.project-proposal/impl/gem5/workload/stress.c"]
+  }
+]

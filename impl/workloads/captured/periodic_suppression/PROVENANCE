@@ -1,0 +1,19 @@
+variant: captured/periodic_suppression
+kind: CAPTURED
+generated_at: 2026-04-20T05:49:43Z
+generator: impl/workloads/tools/convert_digital_csv.py
+source: captured/source/verified_per_period.csv
+source_sha256: a6e0ba7e60a1118a9f89dd2d3334e69fef057a8760c551e2ff1dbe13d0e3d83e
+source_format: STM32 logic-analyzer per-period CSV (2 channels)
+channel_mapping:
+  duty_a <- captured duty_ch0
+  duty_b <- captured duty_ch1
+  duty_c <- SYNTHESIZED constant = median(duty_ch0) = 0.819920
+  (phase C was not captured by the 2-channel logic analyzer)
+witness_model: intended duty held at median(duty_ch0) for all three phases
+period_ns: 50000
+periods: 31942
+duration_s: 1.597100
+config_id: 1
+witness_sha256: f20f79ec6e4773516986bcbdabba3b9449876f409a192e7c0349986a32f64248
+evidence_sha256: 76ee42aee3e30524fc376e39bad67a8f2cdbe2621a094a1c1171b3904497781a

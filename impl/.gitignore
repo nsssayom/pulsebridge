@@ -1,0 +1,25 @@
+build/
+*.o
+*.a
+*.d
+__pycache__/
+*.pyc
+.cache/
+.DS_Store
+
+# Local gem5 / prototype build products
+prototype/build/
+gem5/workload/build/
+
+# Ignore generated result trees but keep the curated publication matrix.
+results/*
+!results/gem5/
+results/gem5/*
+!results/gem5/matrix_full/
+results/gem5/matrix_full/*
+!results/gem5/matrix_full/metrics.csv
+!results/gem5/matrix_full/summary.csv
+!results/gem5/matrix_full/rq1_coherence_per_publish.png
+!results/gem5/matrix_full/rq1_dma_traffic_per_publish.png
+!results/gem5/matrix_full/rq1_torn_reads.png
+!results/gem5/matrix_full/rq3_roi_duration.png

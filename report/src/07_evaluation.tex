@@ -1,0 +1,196 @@
+\section{Evaluation}
+\label{sec:results}
+
+The evaluation matrix contains 30 cells spanning five architectures, two
+workloads, and three contention levels. Table~\ref{tab:agg} reports
+aggregate means over the full matrix. Figure~\ref{fig:mainresults}
+focuses on the captured workload, which is the sharper stress case for
+the publication channel. Figure~\ref{fig:workloads} then shows how the
+ranking changes, or fails to change, when the workload shifts.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/paper_main_results.pdf}
+  \caption{Main result matrix for the captured sparse-divergence
+  workload as contention increases from 0 to 4 stressor CPUs on the
+  x-axis. Each panel compares the same five publication architectures
+  under the same workload and stressor setting. Panel (a) plots the
+  fraction of attempted monitor reads identified as torn snapshots;
+  values above zero indicate that the publication method can return a
+  mixed logical record. Panel (b) plots CPU-side coherence traffic per
+  publish from Ruby message counts, so larger values mean more pressure
+  on the shared hierarchy. Panel (c) plots whole-workload simulated time
+  to retire 5000 publications, which we use as a throughput-style proxy
+  for publication cost rather than as a latency bound. Panel (d) plots
+  read retries per run on a symlog scale, making visible the difference
+  between designs that almost never reject a read and designs that rely
+  heavily on reader retries to preserve correctness.}
+  \label{fig:mainresults}
+\end{figure*}
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Architecture & Torn (\%) & CPU msgs/pub & DMA msgs/pub & Sim time (ms) & Retries/run & Accepted reads (\%) \\
+\midrule
+unsync       & 4.26  & 61.05 & 0.000 & 0.864 & 0.0     & 99.64 \\
+dma-naive    & 18.22 & 49.76 & 0.356 & 0.891 & 0.0     & 25.37 \\
+dma-seqlock  & 0.00  & 28.89 & 0.193 & 0.482 & 14344.8 & 8.03 \\
+seqlock      & 0.00  & 37.76 & 0.000 & 0.485 & 1543.2  & 97.85 \\
+dblbuf       & 0.00  & 27.61 & 0.000 & 0.346 & 0.7     & 99.95 \\
+\bottomrule
+\end{tabular}
+\caption{Aggregate results across the 30-cell matrix, averaged over
+  workloads and contention levels. CPU-side coherence traffic excludes
+  DMA-controller messages. Simulated time is the whole-workload time for
+  5000 publications. ``Accepted reads'' is the fraction of read attempts
+  the monitor accepted; for unsynchronized architectures it is
+  misleadingly high because torn reads are counted as accepted.}
+\label{tab:agg}
+\end{table*}
+
+\subsection{Correctness}
+
+Figure~\ref{fig:mainresults}, panel (a), shows the central correctness
+result. The two architectures without a publication primitive, \unsync
+and \dmanaive, return torn snapshots in every measured condition.
+Averaged over the full matrix, \unsync tears on 4.26\% of reads and
+\dmanaive on 18.22\%. All three disciplined architectures, \seqlock,
+\dblbuf, and \dmaseqlock, return zero torn reads in every cell.
+
+\dmanaive is especially informative. Explicit transfer does not repair a
+broken publication path. Without a handshake, it adds a second race on
+the mirror side and tears more often than the direct-sharing baseline.
+Once the same synchronization discipline is imposed on the mirror,
+correctness is restored. The control variable is therefore the
+publication primitive, not the transport by itself.
+
+\subsection{Cost of Correct Designs}
+
+Once correctness is enforced, the three disciplined architectures
+separate on cost. Panels (b) through (d) of
+Figure~\ref{fig:mainresults} make that split visible on the captured
+workload, while Table~\ref{tab:agg} shows that the same ordering holds
+on average over the full matrix.
+
+\dblbuf is the strongest overall point in the design space. Averaged
+over all 30 cells, it has the lowest CPU-side coherence traffic among
+the correct designs, 27.61 messages per publish, and the shortest
+whole-workload simulated time, 0.346 ms. Relative to \seqlock,
+\dblbuf reduces CPU-side traffic by 27\% and shortens whole-workload
+time by 29\%. Relative to \dmaseqlock, it shortens whole-workload time
+by 28\% while avoiding the synchronized DMA mirror's extra transfer
+path.
+
+\seqlock is also correct, but it keeps the producer and monitor on one
+active record and therefore pays noticeably more CPU-side traffic,
+37.76 messages per publish on average, together with about 1543 retries
+per run. \dmaseqlock shifts most of the reader's interaction away from
+the producer's active line and therefore lands close to \dblbuf in
+CPU-side traffic, 28.89 messages per publish, but it replaces that
+benefit with mirror refreshes and a very heavy retry burden. Averaged
+over the full matrix, \dmaseqlock incurs about 14{,}345 retries per run,
+more than 9$\times$ the retry count of \seqlock. The synchronized DMA
+mirror is therefore correct and competitive, but it is not the cheapest
+correct mechanism in this benchmark.
+
+That comparison should be read carefully. \dmaseqlock is not a
+``coherence disabled'' baseline. The mirror still lives in the same
+coherent substrate. What it changes is where correctness work is paid:
+the direct-sharing designs synchronize at the producer-owned record,
+whereas the DMA design inserts a periodic copy stage and then validates
+the mirror. The cost difference therefore reflects the architectural
+price of turning one publication problem into two coupled stages,
+producer to mirror and mirror to monitor.
+
+\subsection{Read-Side Efficiency}
+
+Retry count is only one side of reader cost. Table~\ref{tab:agg} also
+reports the fraction of read attempts returned as data rather than as a
+retry. On that metric the difference between the correct designs becomes
+sharper. \dblbuf accepts 99.95\% of read attempts, \seqlock accepts
+97.85\%, and \dmaseqlock accepts only 8.03\%.
+
+The explanation is architectural rather than accidental. In \seqlock the
+reader races with producer updates on one active record, so retries
+occur only when the read overlaps that short update window. In
+\dmaseqlock the reader polls a mirror that is refreshed periodically
+regardless of the reader's progress, so every refresh creates another
+opportunity to observe an in-progress publication and retry. That is why
+\dmaseqlock can be logically correct yet operationally expensive for a
+small supervisory core. If monitor CPU budget matters, consumer
+efficiency is part of the channel design, not just a secondary concern.
+
+\subsection{Workload Sensitivity}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.98\columnwidth]{figures/paper_workload_sensitivity.pdf}
+  \caption{Effect of workload shape on CPU-side traffic for the correct
+  designs, averaged over stressor counts. The sustained-bias workload
+  increases traffic for the direct coherent protocols, whereas the
+  synchronized DMA mirror stays nearly flat.}
+  \label{fig:workloads}
+\end{figure}
+
+Figure~\ref{fig:workloads} adds a second result. To keep the comparison
+focused, it averages over stressor counts and shows only the correct
+architectures. Workload shape changes cost more than correctness. Moving
+from the captured sparse-divergence workload to the synthesized
+sustained-bias workload increases average CPU-side coherence traffic by
+37\% for \dblbuf and 36\% for \seqlock, which is the main effect shown
+in the figure.
+The whole-workload simulated time also rises, by 14\% for \dblbuf and
+12\% for \seqlock. In contrast, the synchronized DMA mirror is almost
+flat in CPU-side traffic: its average CPU-side message count changes by
+less than 1\% across the two workloads.
+
+That contrast is consistent with the transport choice. The two direct
+coherent protocols expose the monitor more directly to producer activity
+on the shared publication region, whereas \dmaseqlock makes the monitor
+interact primarily with the mirror and leaves the producer-facing work
+to the DMA engine. Even so, the global ranking does not change.
+\dblbuf remains the lowest-cost correct design, \seqlock remains the
+more expensive direct-sharing alternative, and \dmaseqlock remains a
+correct but retry-heavy explicit-transfer design.
+
+\subsection{Contention Sensitivity and Design Implications}
+
+Increasing the number of stressor CPUs raises traffic and whole-workload
+time for every architecture, as Figure~\ref{fig:mainresults} panels (b)
+and (c) show. What does not change is the qualitative ordering. The
+three disciplined architectures remain zero-torn, the two undisciplined
+architectures remain incorrect, and \dblbuf remains the fastest design
+in every measured cell.
+
+The absolute growth under contention is also informative. On the
+captured workload, moving from zero to four stressor CPUs raises
+\dblbuf's CPU-side traffic from 12.84 to 32.70 messages per publish and
+raises \seqlock's from 18.49 to 44.05. \dmaseqlock starts from the
+lowest CPU-side traffic at zero stressors, 9.80, but climbs to 48.29 by
+four stressors because the mirror path and the shared hierarchy are both
+being exercised under interference. Direct coherent publication is
+therefore not automatically lower-traffic than explicit transfer; the
+interaction between transport, primitive, and interference still
+matters.
+
+The ranking nevertheless has a clear structural explanation. \dblbuf
+keeps the writer and reader mostly off each other's active payload by
+letting the producer fill an inactive slot and then publish a single
+generation word. \seqlock keeps both parties concentrated on one hot
+record, so validation and payload movement contend on the same line.
+\dmaseqlock removes the reader from the producer's active record, but it
+reintroduces overlap at the mirror through the periodic pull cadence.
+What wins in this benchmark is therefore not ``direct sharing'' in the
+abstract, but a specific combination of direct sharing with a primitive
+that minimizes both invalidation pressure and read-side speculation.
+
+Taken together, the results point to a simple design implication for
+\CPS monitor channels. If the monitor is meant to consume the latest
+producer record directly over a coherent fabric, the record should be
+published with an explicit primitive and preferably with a
+generation-based double buffer. If the system instead prefers an
+explicit-transfer design for isolation reasons, that path still needs a
+record-level handshake; transport alone does not provide correctness.

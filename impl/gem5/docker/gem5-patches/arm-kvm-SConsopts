@@ -1,0 +1,21 @@
+# Neutered replacement for src/arch/arm/kvm/SConsopts.
+#
+# The upstream file enables ARM KVM whenever the build host is aarch64.
+# In our Docker container (linux/arm64 on Apple silicon) that flips on
+# src/arch/arm/kvm/armv8_cpu.cc, which in gem5 v25.1.0 has a compile bug
+# (missing include for arch/arm/regs/misc_info.hh — references
+# lookUpMiscReg and MISCREG_USR_NS_WR without declaration).
+#
+# We never run gem5 under host virtualization for this project (SE mode,
+# TimingSimpleCPU, plus Ruby). Disabling the ARM KVM target is therefore
+# strictly a workaround — no functional loss for our sweep.
+#
+# The Makefile `build-gem5` target overwrites
+# gem5-src/src/arch/arm/kvm/SConsopts with this file before scons runs.
+# Bind-mount is :cached, so the write lands on the host submodule; that
+# is acceptable because the submodule is gitignored and re-pinned via
+# .gitmodules.
+
+Import('*')
+# Intentionally empty: do not set KVM_ISA. ARM KVM sources are skipped
+# by src/arch/arm/kvm/SConscript when KVM_ISA != 'arm'.

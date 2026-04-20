@@ -1,0 +1,24 @@
+\begin{abstract}
+Supervisory monitors in cyber-physical systems (CPS) need a timely and
+logically consistent view of controller intent. On multicore platforms,
+cache-coherent shared memory is an attractive export path, but
+coherence does not make a multi-field control record atomic. This paper
+studies publication over coherent memory as an architectural primitive
+for CPS monitoring. Using gem5 ARM SE mode with Ruby
+MESI\_Two\_Level, we compare five publication architectures:
+\unsync, \seqlock, \dblbuf, \dmanaive, and \dmaseqlock. Across a
+30-cell matrix with two PWM-inspired workloads and three contention
+levels, the architectures without an explicit publication primitive
+produce torn snapshots in every condition, whereas the disciplined
+architectures do not. Among the correct designs, generation-based double
+buffering over direct coherent sharing accepts 99.95\% of read attempts,
+compared with 8.03\% for a synchronized DMA mirror, reduces average
+CPU-side coherence traffic by 27\% relative to \seqlock, and shortens
+whole-workload simulated time by 28\% relative to \dmaseqlock while
+keeping retries negligible. Changing workload shape shifts absolute cost
+but does not change the ranking: on the sustained-bias workload, the
+direct-sharing protocols pay 35--37\% more CPU-side traffic, whereas
+the synchronized DMA mirror stays nearly flat. The main conclusion is
+that the decisive design variable is the publication primitive, not
+transport alone.
+\end{abstract}

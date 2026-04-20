@@ -1,0 +1,16 @@
+# Custom gem5 Kconfig preset for ARM + Ruby MESI_Two_Level.
+#
+# Upstream gem5 (v25+) ships ARM_MESI_Three_Level but not ARM_MESI_Two_Level
+# even though the SLICC protocol source (src/mem/ruby/protocol/MESI_Two_Level-*)
+# is still present. This preset stitches them together so we can build
+# `scons build/ARM_MESI_Two_Level/gem5.opt`.
+#
+# The Makefile `build-gem5` target copies this file into
+# $GEM5_ROOT/build_opts/ before invoking scons. The file is idempotent —
+# safe to re-copy even if gem5-src was reset.
+
+BUILD_ISA=y
+USE_ARM_ISA=y
+RUBY=y
+PROTOCOL="MESI_Two_Level"
+RUBY_PROTOCOL_MESI_Two_Level=y

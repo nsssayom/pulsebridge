@@ -1,0 +1,62 @@
+\section{Introduction}
+\label{sec:intro}
+
+Safety-critical \CPS platforms increasingly pair a high-performance
+application complex with a smaller supervisory core that can monitor the
+main control stack and trigger a fail-safe response when needed. This
+pattern appears in current automotive platforms and fits naturally with
+functional-safety practice~\cite{ISO26262,ArmAutoSolutionsOverview,%
+NVIDIADriveFSI}. In parallel, runtime monitoring techniques such as
+\STL provide mature ways to express bounded-window requirements over
+realized behavior~\cite{MalerNickovic2004,FainekosPappas2009,%
+Deshmukh2017,Bartocci2018CPSMonitoring}. What remains less explicit is
+the communication substrate between the controller and the monitor. That
+substrate belongs squarely to computer architecture: it determines how
+producer updates interact with private caches, ordering rules, and
+interference from the rest of the chip.
+
+That substrate matters because the monitor consumes a \emph{record}, not
+a scalar. A practical control record contains an epoch, a timestamp,
+multiple actuation fields, and metadata. Even on a cache-coherent
+multicore, the monitor can still observe a mixed snapshot unless the
+record is published with an explicit synchronization discipline. A policy
+engine that reasons over such a torn record is evaluating a state the
+system was never in.
+
+Two design choices interact in that channel. The first is
+\emph{transport}: the monitor can read the producer's record directly
+through coherent shared memory, or it can read a mirror refreshed by an
+explicit transfer path. The second is the \emph{publication primitive}
+that binds field updates into one logical record. This paper separates
+those choices explicitly. We compare five architectures that combine two
+transports, direct coherent sharing and DMA transfer to a monitor-local
+mirror, with three publication disciplines, none, a sequence lock, and
+a generation-based double buffer. The evaluation uses a PWM-inspired
+producer-monitor benchmark in gem5 ARM SE mode with Ruby
+MESI\_Two\_Level.
+
+We make four contributions.
+\begin{itemize}
+  \item \textbf{Coherence alone is not enough.} Both direct sharing and
+    DMA mirroring produce torn snapshots when no publication primitive is
+    used.
+  \item \textbf{Primitive choice dominates transport choice.} Adding a
+    DMA engine does not fix correctness by itself. In our matrix,
+    \dmanaive tears more often than the unsynchronized direct-sharing
+    baseline.
+  \item \textbf{Generation-based double buffering is the strongest
+    correct design in this study.} It achieves zero torn reads with the
+    lowest CPU-side coherence traffic, the shortest whole-workload
+    simulated time, and negligible reader retries.
+  \item \textbf{Workload shape changes cost but not the ranking.} Under
+    sustained bias, the direct-sharing protocols pay substantially more
+    CPU-side traffic, but the ordering of the correct designs remains
+    stable.
+\end{itemize}
+
+The paper is an architecture study, not a new detection method. The
+monitor is included because it exercises the channel with a realistic
+consumer that imposes a correctness contract and a timing-relevant
+endpoint. The contribution is the characterization of the publication
+path and the decomposition of cost into transport effects, primitive
+effects, and read-side retry behavior.
