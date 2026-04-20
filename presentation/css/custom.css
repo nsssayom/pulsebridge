@@ -1,0 +1,1384 @@
+/* =============================================================
+   Coherent Publication Channels for CPS Monitoring — slide theme
+   16:9 (1280×720) canvas · Okabe–Ito palette · Inter + JetBrains Mono
+   ============================================================= */
+
+:root {
+  --accent:        #009E73;  /* dblbuf green — winner */
+  --accent-soft:   rgba(0, 158, 115, 0.10);
+  --accent-rim:    rgba(0, 158, 115, 0.22);
+  --seqlock:       #0072B2;
+  --dma:           #56B4E9;
+  --warn:          #D55E00;  /* unsync / dma_naive / torn */
+  --warn-soft:     rgba(213, 94, 0, 0.09);
+  --neutral:       #7a7a7a;
+
+  --ink:           #0f1720;
+  --ink-2:         #2c3642;
+  --ink-3:         #5a6472;
+  --ink-4:         #8a8f99;
+
+  --paper:         #ffffff;
+  --panel:         #f7f7f5;
+  --panel-border:  rgba(15, 23, 32, 0.08);
+  --rule:          rgba(15, 23, 32, 0.10);
+
+  --radius:        10px;
+  --radius-sm:     6px;
+  --radius-lg:     14px;
+
+  --font-sans:     "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono:     "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* -------------------------------------------------------------
+   Global
+   ------------------------------------------------------------- */
+
+html, body, .reveal, .reveal .slides {
+  background: var(--paper);
+}
+
+.reveal {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  font-weight: 400;
+  font-feature-settings: "ss01", "cv01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides > section {
+  padding: 56px 80px 68px 80px !important;
+  box-sizing: border-box;
+  top: 0 !important;
+  height: 100%;
+}
+
+/* -------------------------------------------------------------
+   Type scale
+   ------------------------------------------------------------- */
+
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4 {
+  font-family: var(--font-sans);
+  text-transform: none;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0 0 0.5em 0;
+  line-height: 1.12;
+}
+
+.reveal h1 { font-size: 56px; font-weight: 800; }
+.reveal h2 { font-size: 38px; font-weight: 700; margin-bottom: 0.55em; }
+.reveal h3 { font-size: 18px; font-weight: 600; letter-spacing: 0.02em;
+             text-transform: uppercase; color: var(--accent); }
+.reveal h4 { font-size: 16px; font-weight: 600; color: var(--ink-3); }
+
+.reveal p,
+.reveal li {
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0 0 0.55em 0;
+}
+
+.reveal ul, .reveal ol {
+  margin: 0.2em 0 0.5em 0;
+  padding-left: 1.15em;
+}
+
+.reveal li { margin-bottom: 0.35em; }
+
+.reveal strong { color: var(--ink); font-weight: 700; }
+.reveal em     { color: var(--ink-2); font-style: italic; }
+
+.reveal a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-rim);
+}
+
+/* -------------------------------------------------------------
+   Code
+   ------------------------------------------------------------- */
+
+.reveal code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--panel);
+  padding: 0.08em 0.38em;
+  border-radius: 4px;
+  border: 1px solid var(--panel-border);
+}
+
+.reveal h1 code, .reveal h2 code, .reveal h3 code {
+  font-size: 0.88em;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+.reveal pre {
+  font-size: 14px;
+  box-shadow: none;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.reveal pre code {
+  padding: 14px 18px;
+  line-height: 1.55;
+  background: transparent;
+  border: none;
+}
+
+/* -------------------------------------------------------------
+   Slide chrome — tiny header/footer for rhythm across slides
+   ------------------------------------------------------------- */
+
+.reveal .slides > section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 72px; height: 4px;
+  background: var(--accent);
+  border-bottom-right-radius: 4px;
+}
+
+.reveal .slides > section::after {
+  content: "Coherent Publication Channels for CPS Monitoring";
+  position: absolute;
+  bottom: 22px; left: 80px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* Hero slides (title, headline, Q&A) — no footer label */
+.reveal .slides > section.hero::after,
+.reveal .slides > section.title-slide::after {
+  content: "";
+}
+
+.reveal .slide-number {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--ink-4);
+  background: transparent;
+  padding: 6px 10px;
+}
+
+.reveal .progress {
+  color: var(--accent);
+  height: 2px;
+}
+
+.reveal .controls { color: var(--ink-4); }
+
+/* -------------------------------------------------------------
+   Slide templates
+   ------------------------------------------------------------- */
+
+/* --- Title slide --- */
+.reveal section.title-slide {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 96px !important;
+  padding-right: 96px !important;
+}
+
+.reveal section.title-slide h1 {
+  font-size: 54px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35em;
+  max-width: 18ch;
+  color: var(--ink);
+}
+
+.reveal section.title-slide .subtitle {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--ink-3);
+  max-width: 58ch;
+  margin-bottom: 1.6em;
+  line-height: 1.4;
+}
+
+.reveal section.title-slide .rule {
+  width: 56px;
+  height: 3px;
+  background: var(--accent);
+  margin-bottom: 1.4em;
+  border-radius: 2px;
+}
+
+.reveal section.title-slide .author {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.1em;
+}
+
+.reveal section.title-slide .affiliation {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ink-3);
+  margin-bottom: 1.4em;
+}
+
+.reveal section.title-slide .venue {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* --- Hero / headline slides (full-bleed statement) --- */
+.reveal section.hero {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.reveal section.hero .headline {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  max-width: 20ch;
+  margin: 0 auto 0.5em auto;
+}
+
+.reveal section.hero .headline.warn { color: var(--warn); }
+.reveal section.hero .headline.accent { color: var(--accent); }
+
+.reveal section.hero .subhead {
+  font-size: 22px;
+  color: var(--ink-3);
+  font-weight: 400;
+  max-width: 44ch;
+  margin: 0.5em auto 0 auto;
+}
+
+.reveal section.hero .kicker {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1em;
+}
+
+/* --- Figure-dominant slides --- */
+.reveal section.figure-slide {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.reveal section.figure-slide h2 {
+  margin-bottom: 0.25em;
+  flex: 0 0 auto;
+}
+
+.reveal section.figure-slide > .metric-row,
+.reveal section.figure-slide > .callout,
+.reveal section.figure-slide > ul {
+  flex: 0 0 auto;
+}
+
+.reveal section.figure-slide .fig-wrap {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0.4em 0 0.5em 0;
+}
+
+.reveal section.figure-slide img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* --- Diagram-dominant slides --- */
+.reveal section.diagram-slide svg {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  display: block;
+  margin: 0.4em auto;
+}
+
+/* --- Standard content slide --- */
+.reveal section h2 + p,
+.reveal section h2 + ul,
+.reveal section h2 + .grid-2,
+.reveal section h2 + .callout,
+.reveal section h2 + table {
+  margin-top: 0.3em;
+}
+
+/* -------------------------------------------------------------
+   Building blocks
+   ------------------------------------------------------------- */
+
+.reveal .callout {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 16px 20px;
+  margin: 14px 0;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--ink);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.reveal .callout.warn {
+  border-left-color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.reveal .callout strong { color: var(--ink); }
+
+.reveal .panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+}
+
+.reveal .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.reveal .grid-2 .col {
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.reveal .grid-2 .col h3 {
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.55em;
+  color: var(--accent);
+}
+
+/* -------------------------------------------------------------
+   Metric rows (big numbers + labels)
+   ------------------------------------------------------------- */
+
+.reveal .metric-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin: 36px 0 24px 0;
+}
+
+.reveal .metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 18px 20px 18px;
+  background: var(--paper);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  text-align: center;
+  position: relative;
+}
+
+.reveal .metric.win {
+  border-color: var(--accent-rim);
+  background: var(--accent-soft);
+}
+
+.reveal .metric.lose {
+  border-color: rgba(213, 94, 0, 0.22);
+  background: var(--warn-soft);
+}
+
+.reveal .metric .value {
+  font-family: var(--font-sans);
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.reveal .metric.win .value  { color: var(--accent); }
+.reveal .metric.lose .value { color: var(--warn); }
+.reveal .metric .unit {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-3);
+  margin-left: 4px;
+}
+
+.reveal .metric .label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.reveal .metric .sub {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-top: 4px;
+}
+
+/* -------------------------------------------------------------
+   Table
+   ------------------------------------------------------------- */
+
+.reveal table {
+  width: 100%;
+  font-size: 18px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0.4em auto;
+}
+
+.reveal table th,
+.reveal table td {
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.reveal table th {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--ink);
+}
+
+.reveal table td {
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+
+.reveal table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reveal table td code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.reveal table tbody tr.win td {
+  background: var(--accent-soft);
+}
+
+/* -------------------------------------------------------------
+   Transport-vs-primitive matrix
+   ------------------------------------------------------------- */
+
+.reveal .matrix {
+  display: grid;
+  grid-template-columns: 200px repeat(3, 1fr);
+  gap: 6px;
+  margin: 14px 0 18px 0;
+  font-size: 16px;
+}
+
+.reveal .matrix .h-col {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 10px 8px 6px 8px;
+  text-align: center;
+}
+
+.reveal .matrix .h-row {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 14px 10px;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.reveal .matrix .cell {
+  padding: 16px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--ink);
+}
+
+.reveal .matrix .cell.used {
+  background: var(--accent-soft);
+  border-color: var(--accent-rim);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.reveal .matrix .cell.skip {
+  background: transparent;
+  border-style: dashed;
+  border-color: rgba(15, 23, 32, 0.15);
+  color: var(--ink-4);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* -------------------------------------------------------------
+   Pills
+   ------------------------------------------------------------- */
+
+.reveal .pill {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 3px 4px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent-rim);
+}
+
+.reveal .pill.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+  border-color: rgba(213, 94, 0, 0.25);
+}
+
+/* -------------------------------------------------------------
+   Record layout (64-byte field diagram)
+   ------------------------------------------------------------- */
+
+.reveal .record-layout {
+  display: flex;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin: 20px 0 10px 0;
+  background: var(--paper);
+}
+
+.reveal .record-layout .field {
+  padding: 14px 10px 12px 10px;
+  border-right: 1px solid var(--panel-border);
+  text-align: center;
+}
+
+.reveal .record-layout .field:last-child { border-right: none; }
+
+.reveal .record-layout .field .name {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.reveal .record-layout .field .bytes {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--ink-4);
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.reveal .record-layout .field.meta-detail {
+  background: #fff6e0;
+}
+
+.reveal .record-layout .field.meta-detail .bytes {
+  color: #a36500;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.reveal .record-caption {
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-4);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* -------------------------------------------------------------
+   Images (paper figures)
+   ------------------------------------------------------------- */
+
+.reveal img {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  margin: 0 auto;
+  display: block;
+  max-width: 100%;
+}
+
+.reveal .fig-credit {
+  font-size: 12px;
+  color: var(--ink-4);
+  text-align: center;
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
+
+/* -------------------------------------------------------------
+   SVG diagram defaults (for the inline SVGs in slides.md)
+   ------------------------------------------------------------- */
+
+.reveal .diagram {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.reveal .diagram svg {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+}
+
+.reveal svg text { font-family: var(--font-sans); }
+.reveal svg .mono { font-family: var(--font-mono); }
+
+/* -------------------------------------------------------------
+   Fragment polish
+   ------------------------------------------------------------- */
+
+.reveal .fragment.fade-in-then-semi-out {
+  opacity: 0;
+}
+.reveal .fragment.fade-in-then-semi-out.visible {
+  opacity: 1;
+}
+
+/* -------------------------------------------------------------
+   Slide entry — stagger top-level blocks on the active slide
+   ------------------------------------------------------------- */
+
+@keyframes slide-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+.reveal .slides > section.present > * {
+  animation: slide-rise 0.52s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+.reveal .slides > section.present > *:nth-child(1) { animation-delay: 0.02s; }
+.reveal .slides > section.present > *:nth-child(2) { animation-delay: 0.12s; }
+.reveal .slides > section.present > *:nth-child(3) { animation-delay: 0.22s; }
+.reveal .slides > section.present > *:nth-child(4) { animation-delay: 0.30s; }
+.reveal .slides > section.present > *:nth-child(5) { animation-delay: 0.38s; }
+.reveal .slides > section.present > *:nth-child(n+6) { animation-delay: 0.46s; }
+
+/* Never allow content to bleed outside the 1280×720 canvas */
+.reveal .slides > section {
+  overflow: hidden;
+}
+
+/* -------------------------------------------------------------
+   Title-slide kicker
+   ------------------------------------------------------------- */
+
+.reveal section.title-slide .kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.4em;
+}
+
+/* -------------------------------------------------------------
+   Hero answer (big "No.")
+   ------------------------------------------------------------- */
+
+.reveal section.hero .answer-no {
+  font-size: 92px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--warn);
+  line-height: 1;
+  margin-top: 28px;
+}
+
+/* -------------------------------------------------------------
+   TOPOLOGY — producer/monitor + bus/engine (transport diagrams)
+   ------------------------------------------------------------- */
+
+.reveal .topology {
+  display: grid;
+  gap: 18px;
+  margin: 18px 0 14px 0;
+  align-items: stretch;
+}
+
+.reveal .topology.direct { grid-template-columns: 1fr 1.25fr 1fr; }
+.reveal .topology.dma    { grid-template-columns: 1fr 1.25fr 1fr; }
+
+.reveal .topology .zone {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.reveal .node {
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  background: var(--paper);
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.reveal .node.producer { border-left: 5px solid var(--warn); }
+.reveal .node.monitor  { border-left: 5px solid var(--seqlock); }
+
+.reveal .node .role {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 4px;
+}
+
+.reveal .node.producer .role { color: var(--warn); }
+.reveal .node.monitor  .role { color: var(--seqlock); }
+
+.reveal .node .name {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+.reveal .node .detail {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+/* Shared cache line conduit (Transport A) */
+.reveal .conduit {
+  flex: 1;
+  border: 1.5px dashed var(--accent);
+  background:
+    linear-gradient(135deg,
+      rgba(213, 94, 0, 0.06) 0%,
+      var(--accent-soft) 50%,
+      rgba(0, 114, 178, 0.06) 100%);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.reveal .conduit .tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.reveal .conduit .name {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.reveal .conduit .sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+.reveal .topology .caption {
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-4);
+  margin-top: 2px;
+}
+
+/* DMA engine (Transport B) */
+.reveal .engine {
+  position: relative;
+  border: 1.5px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.reveal .engine .tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.reveal .engine .name {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.reveal .engine .cadence {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.reveal .engine .pulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: engine-ping 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes engine-ping {
+  0%   { opacity: 0.5;  transform: scale(0.97); }
+  65%  { opacity: 0;    transform: scale(1.04); }
+  100% { opacity: 0;    transform: scale(1.04); }
+}
+
+/* Memory tile (used in DMA topology) */
+.reveal .memtile {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.reveal .memtile .mt-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 3px;
+}
+
+.reveal .memtile .mt-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.reveal .memtile.mirror {
+  border-color: rgba(0, 114, 178, 0.35);
+  background: rgba(0, 114, 178, 0.06);
+}
+
+.reveal .memtile.mirror .mt-label { color: var(--seqlock); }
+.reveal .memtile.mirror .mt-value { color: var(--seqlock); }
+
+/* Flow arrows between topology columns */
+.reveal .flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  padding: 2px 0;
+}
+
+.reveal .flow-arrow::after {
+  content: "→";
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.reveal .flow-arrow.left::after  { content: "←"; }
+
+/* -------------------------------------------------------------
+   TIMELINE — used for torn-read + sequence-lock diagrams
+   ------------------------------------------------------------- */
+
+.reveal .lane {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.reveal .lane .lane-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: right;
+  line-height: 1.3;
+}
+
+.reveal .lane.producer .lane-title,
+.reveal .lane.writer   .lane-title { color: var(--warn); }
+.reveal .lane.monitor  .lane-title,
+.reveal .lane.reader   .lane-title { color: var(--seqlock); }
+
+.reveal .track {
+  position: relative;
+  height: 72px;
+}
+
+.reveal .track .rail {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(15, 23, 32, 0.15);
+  transform: translateY(-50%);
+}
+
+.reveal .lane.producer .track .rail,
+.reveal .lane.writer   .track .rail { background: rgba(213, 94, 0, 0.45); }
+
+.reveal .lane.monitor  .track .rail,
+.reveal .lane.reader   .track .rail { background: rgba(0, 114, 178, 0.45); }
+
+.reveal .track .evt {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.reveal .track .evt .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  box-shadow: 0 0 0 3px var(--paper);
+}
+
+.reveal .lane.producer .evt .dot,
+.reveal .lane.writer   .evt .dot { background: var(--warn); }
+
+.reveal .lane.monitor  .evt .dot,
+.reveal .lane.reader   .evt .dot { background: var(--seqlock); }
+
+.reveal .track .evt .lbl {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.reveal .track .evt .lbl.above {
+  top: auto;
+  bottom: 14px;
+}
+
+.reveal .track .window {
+  position: absolute;
+  top: calc(50% - 11px);
+  height: 22px;
+  background: rgba(213, 94, 0, 0.10);
+  border: 1px dashed rgba(213, 94, 0, 0.55);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.reveal .track .window .wlabel {
+  position: absolute;
+  top: -18px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warn);
+  white-space: nowrap;
+}
+
+/* Sample marker (torn-read) — lives inside the monitor track,
+   overflows upward to span the producer lane as well */
+.reveal .torn-scope {
+  margin-top: 60px;
+}
+
+.reveal .track .sample-marker {
+  position: absolute;
+  top: -104px;
+  bottom: 0;
+  z-index: 5;
+  pointer-events: none;
+  border-left: 2px dashed var(--seqlock);
+}
+
+.reveal .track .sample-marker .pin {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  transform: translateX(-50%);
+  background: var(--seqlock);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 114, 178, 0.25);
+}
+
+/* Observation card (torn-read) */
+.reveal .observation {
+  margin: 18px auto 0 auto;
+  padding: 14px 22px;
+  background: var(--warn-soft);
+  border: 1.5px solid var(--warn);
+  border-radius: var(--radius-sm);
+  max-width: 780px;
+  text-align: center;
+}
+
+.reveal .observation .tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warn);
+  margin-bottom: 6px;
+}
+
+.reveal .observation .record {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Torn-record — a mini record-layout that color-codes each field
+   by which publication it came from. Mirrors slide-3 vocabulary. */
+.reveal .record-layout.torn {
+  border-color: var(--warn);
+  margin: 6px 0 0 0;
+  background: var(--paper);
+}
+
+.reveal .record-layout.torn .field {
+  padding: 9px 6px 8px 6px;
+  border-right: 1px solid rgba(15, 23, 32, 0.10);
+}
+
+.reveal .record-layout.torn .field:last-child { border-right: none; }
+
+.reveal .record-layout.torn .field .name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.reveal .record-layout.torn .field .val {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  margin: 5px 0 4px 0;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.reveal .record-layout.torn .field .val .sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  opacity: 0.75;
+}
+
+.reveal .record-layout.torn .field .src {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  line-height: 1.1;
+}
+
+.reveal .record-layout.torn .field.pub-new {
+  background: rgba(213, 94, 0, 0.14);
+}
+.reveal .record-layout.torn .field.pub-new .name { color: var(--warn); opacity: 0.9; }
+.reveal .record-layout.torn .field.pub-new .val  { color: var(--warn); }
+.reveal .record-layout.torn .field.pub-new .src  { color: var(--warn); }
+
+.reveal .record-layout.torn .field.pub-old {
+  background: rgba(0, 114, 178, 0.11);
+}
+.reveal .record-layout.torn .field.pub-old .name { color: var(--seqlock); opacity: 0.9; }
+.reveal .record-layout.torn .field.pub-old .val  { color: var(--seqlock); }
+.reveal .record-layout.torn .field.pub-old .src  { color: var(--seqlock); }
+
+.reveal .record-layout.torn .field.detect {
+  background: #fff6e0;
+  border-left: 2px solid #a36500;
+}
+.reveal .record-layout.torn .field.detect .name { color: #a36500; opacity: 0.9; }
+.reveal .record-layout.torn .field.detect .val  { color: #a36500; font-size: 17px; }
+.reveal .record-layout.torn .field.detect .src  { color: #a36500; }
+
+/* -------------------------------------------------------------
+   SLOT DECK (generation-counter double buffer)
+   ------------------------------------------------------------- */
+
+.reveal .slot-deck {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  gap: 14px;
+  margin: 10px 0 6px 0;
+}
+
+.reveal .slot {
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 12px 14px 10px 14px;
+  background: var(--paper);
+  min-height: 104px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.reveal .slot .idx {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+.reveal .slot .payload {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 8px 0 auto 0;
+  line-height: 1.5;
+}
+
+.reveal .slot .state {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 10px;
+}
+
+.reveal .slot.published {
+  border-color: var(--seqlock);
+  background: rgba(0, 114, 178, 0.06);
+}
+.reveal .slot.published .state { color: var(--seqlock); }
+
+.reveal .slot.inflight {
+  border-style: dashed;
+  border-color: var(--warn);
+  background: var(--warn-soft);
+}
+.reveal .slot.inflight .state { color: var(--warn); }
+
+.reveal .gen-card {
+  position: relative;
+  border: 1.5px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 14px 18px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.reveal .gen-card .tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.reveal .gen-card .value {
+  font-family: var(--font-mono);
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  line-height: 1;
+  margin: 8px 0 6px 0;
+}
+
+.reveal .gen-card .note {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+
+/* Two-column writer/reader procedure (seqlock, dblbuf) */
+.reveal .procedure {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.reveal .procedure .col {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px 8px 14px;
+}
+
+.reveal .procedure .col.writer { border-left-color: var(--warn); }
+.reveal .procedure .col.reader { border-left-color: var(--seqlock); }
+
+.reveal .procedure .col h4 {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin: 0 0 6px 0;
+}
+
+.reveal .procedure .col.writer h4 { color: var(--warn); }
+.reveal .procedure .col.reader h4 { color: var(--seqlock); }
+
+.reveal .procedure ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: var(--font-mono);
+  color: var(--ink-2);
+}
+
+.reveal .procedure ol li {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0 0 2px 0;
+  padding-left: 2px;
+}
+
+.reveal .procedure ol li::marker {
+  color: var(--ink-4);
+  font-weight: 600;
+}
+
+.reveal .procedure ol strong { color: var(--ink); font-weight: 700; }
+
+/* -------------------------------------------------------------
+   Print / PDF export
+   ------------------------------------------------------------- */
+
+@media print {
+  .reveal .slides > section::before,
+  .reveal .slides > section::after {
+    display: block !important;
+  }
+  .reveal .slides > section.present > * { animation: none; }
+  .reveal .engine .pulse { animation: none; }
+}
+
+/* -------------------------------------------------------------
+   Reduced motion
+   ------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .slides > section.present > * { animation: none; }
+  .reveal .engine .pulse { animation: none; }
+}
