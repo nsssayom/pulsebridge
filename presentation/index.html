@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
@@ -22,39 +22,48 @@
 </head>
 <body>
   <div class="reveal">
-    <div class="slides">
-      <section data-markdown="slides.md"
-               data-separator="^\r?\n---\r?\n$"
-               data-separator-vertical="^\r?\n--\r?\n$"
-               data-separator-notes="^Note:"
-               data-charset="utf-8">
-      </section>
-    </div>
+    <div class="slides"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
   <script>
-    Reveal.initialize({
-      hash: true,
-      slideNumber: 'c/t',
-      controls: true,
-      controlsTutorial: false,
-      progress: true,
-      center: false,
-      transition: 'fade',
-      transitionSpeed: 'default',
-      backgroundTransition: 'fade',
-      width: 1280,
-      height: 720,
-      margin: 0.0,
-      minScale: 0.2,
-      maxScale: 2.0,
-      pdfSeparateFragments: false,
-      plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
-    });
+    (async function initDeck() {
+      const slides = document.querySelector('.slides');
+
+      try {
+        const response = await fetch('slides.html');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        slides.innerHTML = await response.text();
+      } catch (error) {
+        slides.innerHTML = `
+          <section class="hero">
+            <p class="headline warn">Failed to load slides.</p>
+            <p class="subhead">Run \`python3 presentation/tools/build_slides.py\` and serve the \`presentation/\` directory over HTTP.</p>
+          </section>
+        `;
+        console.error(error);
+      }
+
+      Reveal.initialize({
+        hash: true,
+        slideNumber: 'c/t',
+        controls: true,
+        controlsTutorial: false,
+        progress: true,
+        center: true,
+        transition: 'fade',
+        backgroundTransition: 'fade',
+        width: 1280,
+        height: 720,
+        margin: 0.04,
+        minScale: 0.2,
+        maxScale: 1.6,
+        pdfSeparateFragments: false,
+        plugins: [ RevealHighlight, RevealNotes ],
+      });
+    })();
   </script>
 </body>
 </html>

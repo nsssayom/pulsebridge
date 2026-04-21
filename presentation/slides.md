@@ -1,18 +1,14 @@
 <!-- .slide: class="title-slide" -->
 
-<p class="kicker">Advanced Computer Architecture &middot; Spring 2026</p>
-
-# Coherent Publication Channels for CPS Monitoring
-
+<div class="title-copy">
+<p class="kicker">Advanced Computer Architecture, Spring 2026</p>
+<h1>Coherent Publication Channels for CPS Monitoring</h1>
 <p class="subtitle">Correct and efficient publication of multi-field control records over coherent memory.</p>
-
 <div class="rule"></div>
-
 <p class="author">Nazmus Shakib Sayom</p>
-
-<p class="affiliation">University of Utah &middot; Kahlert School of Computing</p>
-
-<p class="venue">sayomshakib@gmail.com</p>
+<p class="affiliation">University of Utah, Kahlert School of Computing</p>
+<p class="contact">sayom.shakib@utah.edu</p>
+</div>
 
 Note:
 This presentation describes a project that studies the communication channel between the main controller and the safety-critical monitor on modern multicore systems. The systems in question are safety-critical cyber-physical systems, abbreviated CPS, and include automotive ECUs, drone flight controllers, and industrial robots. Modern CPS platforms pair a fast application CPU with a small supervisory core whose role is to catch the main CPU producing an unsafe output before that output reaches an actuator.
@@ -23,20 +19,20 @@ The presentation introduces each technical concept on first use. The audience is
 
 ---
 
-## The safety island pattern
+## Safety Islands on Multicore SoCs
 
 <div class="grid-2">
   <div class="col">
     <h3>What it is</h3>
     <p>A small supervisory core on the same SoC as the main
-    controller. It runs its own software stack. Its one job: detect
+    controller. It runs its own software stack. Its one job: to detect
     unsafe controller output before it reaches the actuator.</p>
   </div>
   <div class="col">
     <h3>Where it appears</h3>
-    <ul>
-      <li>Arm Automotive Enhanced safety island</li>
-      <li>NVIDIA DRIVE functional-safety island</li>
+    <ul class="arrow-list vendor-list">
+      <li><img class="vendor-mark arm" src="web-assets/logos/arm/arm-logo-2025-ink-rgb.svg" alt="Arm"> Arm Automotive Enhanced safety island</li>
+      <li><img class="vendor-mark nvidia" src="web-assets/logos/nvidia/nvidia-logo-black.svg" alt="NVIDIA"> NVIDIA DRIVE functional-safety island</li>
       <li>ISO&nbsp;26262 ASIL-D architectures</li>
       <li>Aerospace and industrial control SoCs</li>
     </ul>
@@ -45,7 +41,7 @@ The presentation introduces each technical concept on first use. The audience is
 
 <div class="callout">
 The question is narrower and more concrete:
-<strong>how should the main controller hand its state over to the
+<strong>How should the main controller hand its state over to the
 safety island?</strong>
 </div>
 
@@ -58,27 +54,90 @@ Given the pattern, the architectural question the project addresses is narrow: h
 
 ---
 
-## What the monitor actually reads
+## The Witness Record: Fields and Layout
 
-<div class="record-layout">
-  <div class="field" style="flex: 2;"><div class="name">epoch</div><div class="bytes">8 B</div></div>
-  <div class="field" style="flex: 2;"><div class="name">ts_ns</div><div class="bytes">8 B</div></div>
-  <div class="field" style="flex: 1;"><div class="name">duty_a</div><div class="bytes">4 B</div></div>
-  <div class="field" style="flex: 1;"><div class="name">duty_b</div><div class="bytes">4 B</div></div>
-  <div class="field" style="flex: 1;"><div class="name">duty_c</div><div class="bytes">4 B</div></div>
-  <div class="field meta-detail" style="flex: 1;"><div class="name">config_id</div><div class="bytes">4 B<br>dup low-16 of epoch</div></div>
-  <div class="field" style="flex: 2;"><div class="name">mac</div><div class="bytes">8 B</div></div>
-  <div class="field" style="flex: 6;"><div class="name">reserved</div><div class="bytes">24 B</div></div>
+<div class="record-shell">
+  <header class="record-header">
+    <div class="record-title">
+      <span class="record-title-kicker">cache line</span>
+      <span class="record-title-value">64 B</span>
+    </div>
+    <div class="record-chips">
+      <span class="chip outline">cache-line aligned</span>
+      <span class="chip outline">1 logical publication</span>
+    </div>
+  </header>
+
+  <div class="record-map">
+    <div class="record-layout">
+      <div class="field ident">
+        <div class="name">epoch</div>
+        <div class="size">8 B</div>
+      </div>
+      <div class="field time">
+        <div class="name">ts_ns</div>
+        <div class="size">8 B</div>
+      </div>
+      <div class="field data">
+        <div class="name">duty_a</div>
+        <div class="size">4 B</div>
+      </div>
+      <div class="field data">
+        <div class="name">duty_b</div>
+        <div class="size">4 B</div>
+      </div>
+      <div class="field data">
+        <div class="name">duty_c</div>
+        <div class="size">4 B</div>
+      </div>
+      <div class="field meta-detail">
+        <div class="name">config_id</div>
+        <div class="size">4 B</div>
+      </div>
+      <div class="field neutral">
+        <div class="name">mac</div>
+        <div class="size">8 B</div>
+      </div>
+      <div class="field neutral">
+        <div class="name">reserved</div>
+        <div class="size">24 B</div>
+      </div>
+    </div>
+
+    <div class="record-ruler">
+      <div class="tick first">
+        <span class="mark-start">0</span>
+        <span class="mark">8</span>
+      </div>
+      <div class="tick"><span class="mark">16</span></div>
+      <div class="tick"><span class="mark">20</span></div>
+      <div class="tick"><span class="mark">24</span></div>
+      <div class="tick"><span class="mark">28</span></div>
+      <div class="tick"><span class="mark">32</span></div>
+      <div class="tick"><span class="mark">40</span></div>
+      <div class="tick last"><span class="mark-end">64</span></div>
+    </div>
+  </div>
 </div>
 
-<p class="record-caption">64 bytes total &middot; cache-line aligned</p>
-
-<ul style="font-size: 18px;">
-  <li><code>epoch</code> &middot; which publication this is</li>
-  <li><code>ts_ns</code> &middot; producer timestamp</li>
-  <li><code>duty_a / b / c</code> &middot; three-phase PWM actuation values</li>
-  <li><code>config_id</code> &middot; carries a <strong>redundant low-16 of epoch</strong> — our torn-read detector</li>
-</ul>
+<div class="detail-grid">
+  <div class="detail-item ident">
+    <h3><code>epoch</code></h3>
+    <p>Which publication the monitor is looking at.</p>
+  </div>
+  <div class="detail-item time">
+    <h3><code>ts_ns</code></h3>
+    <p>Producer timestamp for freshness and ordering.</p>
+  </div>
+  <div class="detail-item data">
+    <h3><code>duty_a / b / c</code></h3>
+    <p>Three-phase PWM actuation values that must be interpreted together.</p>
+  </div>
+  <div class="detail-item warn">
+    <h3><code>config_id</code></h3>
+    <p>Redundant low-16 of <code>epoch</code> used as the torn-read detector.</p>
+  </div>
+</div>
 
 Note:
 The monitor does not read a single scalar value. It reads a structured record consisting of multiple related fields that must be interpreted together as one logical publication.
@@ -93,11 +152,14 @@ One of the metadata fields is central to the rest of the presentation and is wor
 
 <!-- .slide: class="hero" -->
 
-<p class="kicker">The strawman</p>
+<p class="kicker">A Tempting Baseline</p>
 
-<p class="headline">We have cache coherence.<br>Problem solved, right?</p>
+<p class="headline">Does cache coherence alone suffice?</p>
 
-<p class="answer-no fragment">No.</p>
+<p class="answer-no">No.</p>
+
+<p class="subhead">Coherence synchronizes a single address.<br>
+It does not order writes across the fields of a record.</p>
 
 Note:
 A tempting first answer to the channel question is worth stating explicitly, because it represents the most common initial intuition.
@@ -108,14 +170,14 @@ This intuition is incorrect. The next two slides explain why, because the reason
 
 ---
 
-## Coherence is not consistency
+## Coherence Is Not Consistency
 
 <div class="grid-2">
   <div class="col">
     <h3>Coherence</h3>
     <p>A <strong>per-location</strong> property. All agents agree on the
     order of writes to <em>one</em> address.</p>
-    <p style="color: var(--ink-4); font-size: 15px;">
+    <p class="principle-caption">
       "Writes to X happen in some global order."
     </p>
   </div>
@@ -123,18 +185,17 @@ This intuition is incorrect. The next two slides explain why, because the reason
     <h3>Consistency</h3>
     <p>A <strong>cross-location</strong> property. Rules about ordering
     writes across <em>different</em> addresses.</p>
-    <p style="color: var(--ink-4); font-size: 15px;">
+    <p class="principle-caption">
       "If I write X then Y, does anyone else see them in that order?"
     </p>
   </div>
 </div>
 
-<div class="callout warn">
-ARMv8 is a <strong>weakly ordered</strong> memory model. Without explicit
-release / acquire or a <code>DMB</code> barrier, the hardware and compiler
-are free to reorder independent writes. A reader on another core can see
-fields in a different order than the writer issued them.
-</div>
+<ul class="consequence">
+  <li><strong>ARMv8 is weakly ordered.</strong> Independent writes may commit out of program order.</li>
+  <li><strong>No release / acquire, no <code>DMB</code> &rarr; no ordering.</strong> Hardware and compiler are free to reorder.</li>
+  <li><strong>Consequence.</strong> A reader on another core can see fields in a different order than the writer issued them.</li>
+</ul>
 
 Note:
 Cache coherence and memory consistency sound like synonyms, but they describe different properties, and they are routinely confused. Both require explicit definition.
@@ -147,7 +208,7 @@ This reordering is the vulnerability that the next slide illustrates.
 
 ---
 
-## A torn read, in slow motion
+## Anatomy of a Torn Read
 
 <div class="torn-scope">
   <div class="lane producer">
@@ -177,7 +238,7 @@ This reordering is the vulnerability that the next slide illustrates.
 </div>
 
 <div class="observation fragment">
-  <div class="tag">observed — chimera record, never existed in producer</div>
+  <div class="tag">observed: chimera record, never existed in producer</div>
   <div class="record-layout torn">
     <div class="field pub-new" style="flex: 2;">
       <div class="name">epoch</div>
@@ -220,11 +281,12 @@ This observation is a torn read. The redundant-epoch detector catches it. The lo
 
 <!-- .slide: class="hero" -->
 
-<p class="kicker">Why this matters</p>
+<p class="kicker">Correctness Implication</p>
 
-<p class="headline">The policy layer is now reasoning about a state the system was never in.</p>
+<p class="headline">A torn read is a correctness failure, not a latency event.</p>
 
-<p class="subhead">This is not latency jitter. It is a wrong answer.</p>
+<p class="subhead">The monitor evaluates a state that never existed.<br>
+The verdict is not stale. It is about the wrong system.</p>
 
 Note:
 It is necessary to categorize what a torn read actually is. The natural initial reaction is that the monitor simply missed one sample and will recover on the next one, so the event is tolerable. That framing is incorrect.
@@ -235,7 +297,7 @@ This categorization governs the rest of the analysis. The project does not aim t
 
 ---
 
-## Two design choices, not one
+## Two Orthogonal Design Dimensions
 
 <div class="matrix">
   <div class="h-col"></div>
@@ -280,7 +342,7 @@ The resulting five architectures are the units of comparison for the remainder o
 
 ---
 
-## Transport A &middot; direct coherent sharing
+## Transport A: Direct Coherent Sharing
 
 <div class="topology direct">
   <div class="zone">
@@ -295,7 +357,7 @@ The resulting five architectures are the units of comparison for the remainder o
     <div class="conduit">
       <div class="tag">shared cache line</div>
       <div class="name">witness record</div>
-      <div class="sub">64 bytes &middot; coherent</div>
+      <div class="sub">64 bytes, coherent</div>
     </div>
     <div class="caption">MESI moves the line between L1 caches on demand</div>
   </div>
@@ -309,11 +371,20 @@ The resulting five architectures are the units of comparison for the remainder o
   </div>
 </div>
 
-<ul style="font-size: 17px; margin-top: 8px;">
-  <li>One memory region &middot; no explicit copy</li>
-  <li>Producer's write invalidates the monitor's copy</li>
-  <li>Monitor re-fetches the line on next read</li>
-</ul>
+<div class="fact-strip">
+  <div class="fact">
+    <span>Memory layout</span>
+    One shared witness record
+  </div>
+  <div class="fact">
+    <span>Producer effect</span>
+    Writes invalidate the monitor's copy
+  </div>
+  <div class="fact">
+    <span>Reader cost</span>
+    Next read refetches the hot line
+  </div>
+</div>
 
 Note:
 Transport A is direct coherent sharing, the simplest option. The producer writes to a shared record. The monitor reads the same record. The cache coherence protocol, MESI in this setup, moves the cache line between the two cores' L1 caches on demand. The L1 cache is the smallest and fastest level of the cache hierarchy and sits adjacent to each core.
@@ -324,7 +395,7 @@ This is the design that the intuition addressed two slides earlier corresponds t
 
 ---
 
-## Transport B &middot; DMA-pulled mirror
+## Transport B: DMA-Pulled Mirror
 
 <div class="topology dma">
   <div class="zone">
@@ -362,9 +433,20 @@ This is the design that the intuition addressed two slides earlier corresponds t
   </div>
 </div>
 
-<p style="text-align: center; font-size: 14px; color: var(--ink-3); margin-top: 8px;">
-Mirror page still lives in <strong>coherent memory</strong> — this is not a coherence-disabled baseline.
-</p>
+<div class="fact-strip">
+  <div class="fact">
+    <span>Producer side</span>
+    Writes its own private record
+  </div>
+  <div class="fact">
+    <span>Engine cadence</span>
+    The mirror refreshes every 1000 ns
+  </div>
+  <div class="fact">
+    <span>Important caveat</span>
+    The mirror is still <strong>coherent memory</strong>
+  </div>
+</div>
 
 Note:
 Transport B is an explicit hardware transfer. The producer writes to its own private memory. A small direct-memory-access engine, called a DMA engine, periodically copies the record from producer memory into a separate mirror page, and the monitor reads only from the mirror. DMA is a standard SoC feature that allows an I/O block to move data between memory regions without involving the CPU.
@@ -375,7 +457,7 @@ One detail is important. The mirror page still resides in coherent memory. This 
 
 ---
 
-## Primitive A &middot; sequence lock
+## Primitive A: Sequence Lock
 
 <div class="lane writer">
   <div class="lane-title">Writer</div>
@@ -417,7 +499,7 @@ The reader never acquires a lock, which makes the design lock-free on the reader
 
 ---
 
-## Primitive B &middot; generation-counter double buffer
+## Primitive B: Generation-Counter Double Buffer
 
 <div class="slot-deck">
   <div class="slot published">
@@ -433,7 +515,7 @@ The reader never acquires a lock, which makes the design lock-free on the reader
   <div class="gen-card">
     <div class="tag">published_gen</div>
     <div class="value">k</div>
-    <div class="note">monotonic &middot; release-stored after slot fill</div>
+    <div class="note">monotonic, release-stored after slot fill</div>
   </div>
 </div>
 
@@ -472,7 +554,7 @@ One design point is easy to overlook. A binary flag that indicates the current s
 
 ---
 
-## The five architectures
+## The Five Evaluated Architectures
 
 <table>
   <thead>
@@ -499,6 +581,11 @@ holds transport fixed, varies primitive. &nbsp;<code>unsync</code> vs
 hold primitive fixed, vary transport.
 </div>
 
+<div class="callout warn">
+<strong>Why no DMA + double buffer?</strong>
+The pull engine copies one mirror slot, not a two-slot pair. Generation-counter double buffering would require redesigning the engine, so the sixth cell is left out of scope.
+</div>
+
 Note:
 The complete matrix comprises five architectures. Three use direct coherent sharing: `unsync` uses no primitive, `seqlock` uses a sequence lock, and `dblbuf` uses a generation-counter double buffer. Two use the DMA-pulled mirror: `dma_naive` uses no primitive, and `dma_seqlock` uses a sequence lock on the mirror.
 
@@ -508,21 +595,40 @@ This grid is the analytical frame used to interpret every result that follows.
 
 ---
 
-<!-- .slide: class="figure-slide" -->
+## Experimental Testbed
 
-## The testbed
-
-<div class="fig-wrap">
-  <img src="figures/witness_evidence_arch_print.svg" alt="Producer core, publication channel, monitor core, evidence stream">
+<div class="testbed-split">
+  <div class="spec-sheet">
+    <div class="spec-row">
+      <span class="spec-tag">simulator</span>
+      <div class="spec-body">
+        <img class="inline-logo gem5" src="web-assets/logos/gem5/gem5-color-long.gif" alt="gem5">
+        <span>25.1.0, ARM SE mode, <code>TimingSimpleCPU</code></span>
+      </div>
+    </div>
+    <div class="spec-row">
+      <span class="spec-tag">protocol</span>
+      <div class="spec-body">Ruby <code>MESI_Two_Level</code>, two-level MESI hierarchy</div>
+    </div>
+    <div class="spec-row">
+      <span class="spec-tag">topology</span>
+      <div class="spec-body">Producer + monitor + joiner, with 0 / 2 / 4 stressor CPUs</div>
+    </div>
+    <div class="spec-row">
+      <span class="spec-tag">dma</span>
+      <div class="spec-body">Custom <code>WitnessPullEngine</code> on the Ruby DMA sequencer</div>
+    </div>
+    <div class="spec-row caveat">
+      <span class="spec-tag">scope</span>
+      <div class="spec-body"><strong>Protocol evidence</strong>, not a cycle-accurate CHI model</div>
+    </div>
+  </div>
+  <div class="figure">
+    <div class="fig-wrap">
+      <img src="figures/witness_evidence_arch_print.svg" alt="Producer core, publication channel, monitor core, evidence stream">
+    </div>
+  </div>
 </div>
-
-<ul style="font-size: 16px; columns: 2; column-gap: 40px;">
-  <li>gem5 25.1.0 &middot; ARM SE mode &middot; <code>TimingSimpleCPU</code></li>
-  <li>Ruby <code>MESI_Two_Level</code> coherence protocol</li>
-  <li>Producer + monitor + joiner, 0 / 2 / 4 stressor CPUs</li>
-  <li>Custom <code>WitnessPullEngine</code> on Ruby DMA sequencer</li>
-  <li><strong>Not</strong> cycle-accurate CHI — protocol-level evidence</li>
-</ul>
 
 Note:
 All five architectures are implemented in C11, which is the 2011 C language standard, as a shared core library. The library is cross-compiled for 64-bit ARM, identified by the target name `aarch64`, and executed under gem5 in system-emulation mode. System-emulation mode is a gem5 configuration that executes a user-mode binary directly, without booting a full operating system.
@@ -535,7 +641,7 @@ One honest qualification up front: this testbed is not a cycle-accurate model of
 
 ---
 
-## Matrix and metrics
+## Experimental Matrix and Metrics
 
 <div class="grid-2">
   <div class="col">
@@ -549,17 +655,17 @@ One honest qualification up front: this testbed is not a cycle-accurate model of
   </div>
   <div class="col">
     <h3>Workloads</h3>
-    <ul>
+    <ul class="arrow-list">
       <li><code>captured/periodic_suppression</code><br>
-          real STM32 per-period capture &middot; sparse divergence</li>
+          Real STM32 per-period capture, sparse divergence</li>
       <li><code>synthesized/duty_bias</code><br>
-          +15% multiplicative bias &middot; sustained</li>
+          Sustained +15% multiplicative bias</li>
     </ul>
   </div>
 </div>
 
-<h3 style="margin-top: 22px;">Metrics</h3>
-<p style="font-size: 15px; margin-top: 4px;">
+<h3 class="metrics-heading">Metrics</h3>
+<p class="metric-pill-row">
 <span class="pill">Torn-read fraction</span>
 <span class="pill">CPU msgs / publish</span>
 <span class="pill">DMA msgs / publish</span>
@@ -580,9 +686,9 @@ Each cell contributes five primary metrics. The first is torn-read fraction, mea
 
 <!-- .slide: class="figure-slide" -->
 
-## Result 1 &middot; correctness
+## Result 1: Correctness (Torn-Read Fraction)
 
-<div class="fig-wrap">
+<div class="fig-wrap r-stretch">
   <img src="figures/rq1_torn_reads.png" alt="Torn-read fraction by protocol and contention level">
 </div>
 
@@ -606,13 +712,13 @@ Transport alone does not solve the tearing problem. The primitive does. This is 
 
 <!-- .slide: class="figure-slide" -->
 
-## Result 2 &middot; CPU coherence traffic
+## Result 2: CPU-Side Coherence Traffic
 
-<div class="fig-wrap">
+<div class="fig-wrap r-stretch">
   <img src="figures/rq1_coherence_per_publish.png" alt="CPU-side coherence messages per publish">
 </div>
 
-<div class="metric-row" style="grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 14px 0 0 0;">
+<div class="metric-row tight">
   <div class="metric win">
     <div class="value">27.6</div>
     <div class="label">dblbuf</div>
@@ -641,13 +747,13 @@ The explanation for `seqlock`'s higher cost is architectural. A seqlock keeps bo
 
 <!-- .slide: class="figure-slide" -->
 
-## Result 3 &middot; whole-workload time
+## Result 3: Whole-Workload Simulated Time
 
-<div class="fig-wrap">
+<div class="fig-wrap r-stretch">
   <img src="figures/rq3_roi_duration.png" alt="Whole-workload simulated time">
 </div>
 
-<div class="metric-row" style="grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 14px 0 0 0;">
+<div class="metric-row tight">
   <div class="metric win">
     <div class="value">0.346<span class="unit">ms</span></div>
     <div class="label">dblbuf</div>
@@ -672,7 +778,7 @@ The second cost dimension is whole-workload simulated time: the total simulated-
 
 ---
 
-## Result 4 &middot; the retry cliff
+## Result 4: Reader-Side Retry Cost
 
 <div class="metric-row">
   <div class="metric win">
@@ -692,8 +798,8 @@ The second cost dimension is whole-workload simulated time: the total simulated-
   </div>
 </div>
 
-<p style="text-align: center; font-size: 14px; color: var(--ink-4); margin-top: -6px;">
-averaged across the 30-cell matrix &middot; 5000 publications per run
+<p class="result-note">
+Averaged across the 30-cell matrix, 5000 publications per run
 </p>
 
 <div class="callout warn">
@@ -712,7 +818,7 @@ Correctness is a binary property. Cost is not. The two must be measured and repo
 
 ---
 
-## Result 5 &middot; the accepted-read cliff
+## Result 5: Accepted-Read Fraction
 
 <div class="metric-row">
   <div class="metric win">
@@ -735,10 +841,10 @@ Correctness is a binary property. Cost is not. The two must be measured and repo
 <div class="callout">
 The DMA mirror refreshes on <strong>its own cadence</strong>, regardless
 of reader progress. Every refresh is another chance to observe an
-in-progress mirror update — and retry.
+in-progress mirror update, then retry.
 </div>
 
-<p style="text-align: center; font-size: 15px; color: var(--ink-3); margin-top: 2px;">
+<p class="result-note emphasis">
 On a CPU-budget-constrained supervisory core, that matters.
 </p>
 
@@ -753,25 +859,25 @@ This result matters because a real safety-island core operates under a bounded C
 
 ---
 
-## Workload and contention
+## Sensitivity to Workload and Contention
 
 <div class="grid-2">
   <div class="col">
     <h3>Workload shape</h3>
-    <p style="font-size: 17px;">Captured &rarr; synthesized (sustained bias):</p>
-    <ul style="font-size: 16px;">
-      <li><code>dblbuf</code> &middot; <strong>+37%</strong> CPU traffic</li>
-      <li><code>seqlock</code> &middot; <strong>+36%</strong> CPU traffic</li>
-      <li><code>dma_seqlock</code> &middot; <strong>&lt;1%</strong> (flat)</li>
+    <p class="section-lede">Captured &rarr; synthesized (sustained bias):</p>
+    <ul class="compact-list arrow-list">
+      <li><code>dblbuf</code>: <strong>+37%</strong> CPU traffic</li>
+      <li><code>seqlock</code>: <strong>+36%</strong> CPU traffic</li>
+      <li><code>dma_seqlock</code>: <strong>&lt;1%</strong> (flat)</li>
     </ul>
   </div>
   <div class="col">
-    <h3>Contention &middot; 0 &rarr; 4 stressors</h3>
-    <p style="font-size: 17px;">All architectures grow. <strong>Ordering does not change.</strong></p>
-    <ul style="font-size: 16px;">
-      <li>3 disciplined architectures &middot; zero-torn in every cell</li>
-      <li>2 undisciplined architectures &middot; tear in every cell</li>
-      <li><code>dblbuf</code> &middot; fastest in every cell</li>
+    <h3>Contention (0 &rarr; 4 stressors)</h3>
+    <p class="section-lede">All architectures grow. <strong>Ordering does not change.</strong></p>
+    <ul class="compact-list arrow-list">
+      <li>3 disciplined architectures: zero-torn in every cell</li>
+      <li>2 undisciplined architectures: tear in every cell</li>
+      <li><code>dblbuf</code>: fastest in every cell</li>
     </ul>
   </div>
 </div>
@@ -794,11 +900,13 @@ Workload and contention shift the absolute numbers. They do not change the ranki
 
 <!-- .slide: class="hero" -->
 
-<p class="kicker">The headline</p>
+<p class="kicker">Central Claim</p>
 
-<p class="headline">Coherence is the substrate,<br>not the publication contract.</p>
+<p class="headline">Coherence is the substrate, not the publication contract.</p>
 
-<p class="subhead">A coherent fabric moves the latest line. It cannot tell the reader whether the fields on that line belong to one logical publication.</p>
+<p class="subhead">Coherence moves the most recent cache line.<br>
+It does not attest that its fields belong to the same publication.<br>
+That contract must come from the primitive.</p>
 
 Note:
 The project's central finding, stated in one sentence: a coherent memory fabric can move the most recent cache line rapidly, but it cannot inform the reader whether the multiple fields on that line belong to one logical publication. That property is a contract, and the contract must be supplied by the publication primitive, not by the transport.
@@ -807,24 +915,21 @@ Across the five architectures evaluated, the choice of primitive dominates the c
 
 ---
 
-## Design implications
+## Design Implications
 
-<div class="callout">
-<strong>Direct coherent sharing?</strong> Use a <strong>generation-counter
-double buffer</strong>. Not a sequence lock. Not a binary
-published-index flag.
-</div>
-
-<div class="callout">
-<strong>Explicit transfer for isolation?</strong> The mirror still needs
-a <strong>record-level handshake</strong>. Transport alone does not buy
-correctness — and the reader will pay in retries.
-</div>
-
-<div class="callout">
-<strong>Specify three things</strong> about every monitor channel:
-the publication unit, the validity check, and the reader's behavior on
-overlap.
+<div class="principle-list">
+  <div class="principle">
+    <div class="principle-num">01</div>
+    <p><strong>Direct coherent sharing:</strong> Use a <strong>generation-counter double buffer</strong>. Not a sequence lock. Not a binary published-index flag.</p>
+  </div>
+  <div class="principle">
+    <div class="principle-num">02</div>
+    <p><strong>Isolation via explicit transfer:</strong> The mirror still needs a <strong>record-level handshake</strong>. Transport alone does not buy correctness. The reader pays for isolation in retries.</p>
+  </div>
+  <div class="principle">
+    <div class="principle-num">03</div>
+    <p><strong>Specify every channel</strong> on three axes: the publication unit, the validity check, and the reader's behavior on overlap.</p>
+  </div>
 </div>
 
 Note:
@@ -838,25 +943,31 @@ The broader implication is that a monitor channel specification should state thr
 
 ---
 
-## Limitations and next steps
+## Limitations and Future Work
 
-<ul style="font-size: 17px;">
-  <li><strong>Protocol-level, not cycle-accurate.</strong> Ruby
-  <code>MESI_Two_Level</code> gives message counts and ordering evidence
-  — not a specific commercial interconnect (CHI, UPI, AXI4-ACE).</li>
-  <li><strong>Throughput proxy, not latency distribution.</strong>
-  Whole-workload simulated time is a cost proxy over 5000 publications.
-  Per-publication latency instrumentation is the natural next step.</li>
-  <li><strong>One DMA cadence.</strong> We fix 1000 ns for the pull
-  engine. Sweeping cadence is future work.</li>
-  <li><strong>One coherence protocol.</strong> <code>MESI_Two_Level</code>
-  only. MOESI or directory-based variants may shift absolute numbers.</li>
-</ul>
+<div class="limit-grid">
+  <div class="limit-card">
+    <h3>Protocol evidence</h3>
+    <p>Ruby <code>MESI_Two_Level</code> gives ordering and message-count evidence, not a cycle-accurate model of CHI, UPI, or AXI4-ACE.</p>
+  </div>
+  <div class="limit-card">
+    <h3>Throughput proxy</h3>
+    <p>Whole-workload simulated time is a cost proxy over 5000 publications, not a per-publication latency distribution.</p>
+  </div>
+  <div class="limit-card">
+    <h3>Fixed DMA cadence</h3>
+    <p>The pull engine is fixed at 1000 ns. Sweeping cadence is straightforward future work.</p>
+  </div>
+  <div class="limit-card">
+    <h3>One coherence protocol</h3>
+    <p><code>MESI_Two_Level</code> only. Alternative directory variants may shift absolute numbers even if the ranking remains stable.</p>
+  </div>
+</div>
 
-<p style="font-size: 13px; color: var(--ink-4); margin-top: 18px; letter-spacing: 0.02em;">
-Repo &amp; paper:
-<code>github.com/nsssayom/adv.comp.arc.project-proposal</code>
-</p>
+<div class="repo-band">
+  <span>Paper + repo</span>
+  <code>github.com/nsssayom/pulsebridge</code>
+</div>
 
 Note:
 To close, an honest accounting of what this project is and is not.
@@ -871,21 +982,23 @@ The repository and the written report are linked on this slide. Thank you. Quest
 
 ---
 
-<!-- .slide: class="title-slide" -->
+<!-- .slide: class="title-slide closing-slide" -->
 
+<div class="title-copy">
 <p class="kicker">Thank you</p>
-
-# Questions?
-
+<h1>Questions?</h1>
 <p class="subtitle">Coherent publication channels for CPS monitoring.</p>
-
 <div class="rule"></div>
-
 <p class="author">Nazmus Shakib Sayom</p>
+<p class="affiliation">University of Utah, Kahlert School of Computing</p>
+<p class="contact">sayom.shakib@utah.edu</p>
+<p class="repo">github.com/nsssayom/pulsebridge</p>
+</div>
 
-<p class="affiliation">sayomshakib@gmail.com</p>
-
-<p class="venue">github.com/nsssayom/adv.comp.arc.project-proposal</p>
+<div class="closing-qr">
+  <img src="web-assets/qr/git-repo-qr.png" alt="github.com/nsssayom/pulsebridge">
+  <p class="qr-caption">scan to view repo</p>
+</div>
 
 Note:
 Thank you. Questions are welcome.
