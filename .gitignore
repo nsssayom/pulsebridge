@@ -43,3 +43,4 @@ build/
 *.synctex.gz
 *.toc
 
+paper/

@@ -1,7 +1,7 @@
 # impl/
 
-Implementation tree for the coherent publication study described in the
-paper under `../report/`.
+Implementation tree for the witness-publication channel study in this
+repository.
 
 ## Layout
 
